@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoPickup – Status</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="page-topbar eco-topbar">
+    <a href="index.html" class="back-arrow">←</a>
+    <h2>Track Status</h2>
+    <span></span>
+  </div>
+
+  <!-- ===== SEARCH SECTION ===== -->
+  <div class="status-search-section">
+    <div class="search-icon">🔍</div>
+    <p class="search-hint">Enter your Request ID to track pickup status</p>
+    <form id="statusForm" onsubmit="return validateStatus()">
+      <div class="input-group">
+        <div class="input-wrap">
+          <span class="input-icon">🆔</span>
+          <input type="text" id="requestId" name="requestId" placeholder="e.g. REQ1001"/>
+        </div>
+        <span class="error" id="idError"></span>
+      </div>
+      <button type="submit" class="btn-submit">Check Status</button>
+    </form>
+  </div>
+
+  <!-- ===== RESULT CONTAINER ===== -->
+  <div id="resultContainer"></div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">
+      <span class="nav-icon">🏠</span><span>Home</span>
+    </a>
+    <a href="request.html" class="nav-item">
+      <span class="nav-icon">📝</span><span>Request</span>
+    </a>
+    <a href="status.html" class="nav-item active">
+      <span class="nav-icon">🔍</span><span>Track</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">👤</span><span>Profile</span>
+    </a>
+  </nav>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

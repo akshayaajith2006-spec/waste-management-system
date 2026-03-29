@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoPickup – Login</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --g-dark: #064e35;
+      --g-mid: #059669;
+      --g-base: #10b981;
+      --g-light: #34d399;
+      --gold: #d4af37;
+      --gold-mid: #e8c547;
+      --gold-lite: #f0d060;
+      --bg: #f4fdf7;
+      --card: #ffffff;
+      --text: #0c2116;
+      --soft: #5a7a65;
+      --border: #c6f0d9;
+      --error: #dc2626;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0a1f0e;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* BG mesh */
+    .mesh {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 15% 20%, rgba(16, 185, 129, 0.3) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 75%, rgba(212, 175, 55, 0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 70% 10%, rgba(5, 150, 105, 0.18) 0%, transparent 60%);
+      animation: meshMove 10s ease-in-out infinite;
+    }
+
+    @keyframes meshMove {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .85;
+        transform: scale(1.04);
+      }
+    }
+
+    .noise {
+      position: absolute;
+      inset: 0;
+      opacity: .03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      pointer-events: none;
+    }
+
+    .orb-1 {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(16, 185, 129, .35), transparent);
+      top: -80px;
+      left: -60px;
+      animation: orbf 9s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(212, 175, 55, .28), transparent);
+      bottom: -60px;
+      right: -40px;
+      animation: orbf 11s ease-in-out infinite -4s;
+    }
+
+    @keyframes orbf {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(20px, -25px);
+      }
+    }
+
+    /* ── Card ── */
+    .login-card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      margin: 20px;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(212, 175, 55, 0.15);
+    }
+
+    /* Gold top bar */
+    .gold-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #10b981, #d4af37, #10b981);
+      background-size: 200%;
+      animation: barShimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes barShimmer {
+
+      0%,
+      100% {
+        background-position: 0%;
+      }
+
+      50% {
+        background-position: 100%;
+      }
+    }
+
+    /* ── Header ── */
+    .card-head {
+      background: linear-gradient(135deg, #064e35 0%, #059669 55%, #0d9488 100%);
+      padding: 32px 28px 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-head::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: -20px;
+      right: -20px;
+      height: 40px;
+      background: rgba(244, 253, 247, 0.97);
+      border-radius: 50%;
+    }
+
+    .brand-logo {
+      font-size: 52px;
+      display: inline-block;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-name span {
+      background: linear-gradient(135deg, #f0d060, #d4af37);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.65);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ── Tab switcher ── */
+    .card-body {
+      padding: 28px 28px 32px;
+    }
+
+    .role-tabs {
+      display: flex;
+      background: #f0fdf4;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 26px;
+      gap: 4px;
+    }
+
+    .role-tab {
+      flex: 1;
+      padding: 11px 8px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+      transition: all .3s;
+      color: var(--soft);
+      border: none;
+      background: transparent;
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .role-tab.active {
+      background: linear-gradient(135deg, var(--g-dark), var(--g-mid));
+      color: white;
+      box-shadow: 0 6px 18px rgba(5, 150, 105, 0.3);
+    }
+
+    /* ── Form ── */
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+      animation: fadeIn .35s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--g-dark);
+      margin-bottom: 18px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 7px;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f6fef9;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      transition: all .3s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--g-base);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, .1);
+    }
+
+    .input-wrap .ico {
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .input-wrap input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 15px;
+      font-family: 'Nunito', sans-serif;
+      width: 100%;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* password toggle */
+    .toggle-pw {
+      font-size: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+      opacity: .5;
+      transition: opacity .2s;
+    }
+
+    .toggle-pw:hover {
+      opacity: 1;
+    }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 5px;
+      display: block;
+    }
+
+    /* Admin badge */
+    .admin-hint {
+      background: linear-gradient(135deg, #fef9e7, #fef3c7);
+      border: 1px solid rgba(212, 175, 55, .35);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #78350f;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Submit btn */
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      border: none;
+      border-radius: 13px;
+      font-size: 15px;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: all .3s;
+      box-shadow: 0 8px 24px rgba(5, 150, 105, .3);
+      position: relative;
+      overflow: hidden;
+      letter-spacing: .3px;
+    }
+
+    .btn-login::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, .6), transparent);
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(5, 150, 105, .4);
+    }
+
+    .divider {
+      text-align: center;
+      margin: 18px 0;
+      font-size: 12px;
+      color: var(--soft);
+      font-weight: 700;
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 42%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border));
+    }
+
+    .divider::before {
+      left: 0;
+    }
+
+    .divider::after {
+      right: 0;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    .signup-row {
+      text-align: center;
+      font-size: 13px;
+      color: var(--soft);
+      font-weight: 700;
+    }
+
+    .signup-row a {
+      color: var(--g-base);
+      font-weight: 800;
+    }
+
+    .signup-row a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Signup form ── */
+    .toggle-form {
+      display: none;
+    }
+
+    .toggle-form.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="mesh"></div>
+  <div class="noise"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="login-card">
+    <div class="gold-bar"></div>
+
+    <!-- Header -->
+    <div class="card-head">
+      <div class="brand-logo">🌍</div>
+      <div class="brand-name">Eco<span>Pickup</span></div>
+      <div class="brand-sub">Smart Waste Management</div>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Role tabs -->
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="switchRole('user')">👤 User</button>
+        <button class="role-tab" onclick="switchRole('admin')">🛡️ Admin</button>
+      </div>
+
+      <!-- ══ USER LOGIN ══ -->
+      <div class="form-section active" id="userSection">
+
+        <!-- Login Form -->
+        <div class="toggle-form active" id="userLogin">
+          <div class="section-label">Welcome back 👋</div>
+          <div class="field">
+            <label>Email / Phone</label>
+            <div class="input-wrap">
+              <span class="ico">📧</span>
+              <input type="text" id="uEmail" placeholder="you@email.com or 10-digit" />
+            </div>
+            <span class="error-msg" id="uEmailErr"></span>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="ico">🔒</span>
+              <input type="password" id="uPass" placeholder="Your password" />
+              <span class="toggle-pw" onclick="togglePw('uPass',this)">👁️</span>
+            </div>
+            <span class="error-msg" id="uPassErr"></span>
+          </div>
+          <button class="btn-login" onclick="loginUser()">Login as User →</button>
+          <div class="divider">or</div>
+          <div class="signup-row">Don't have an account? <a href="#" onclick="showForm('userSignup')">Sign Up</a></div>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div class="toggle-form" id="userSignup">
+          <div class="section-label">Create Account 🌱</div>
+          <div class="field">
+            <label>Full Name</label>
+            <div class="input-wrap">
+              <span class="ico">👤</span>
+              <input type="text" id="suName" placeholder="Your full name" />
+            </div>
+            <span class="error-msg" id="suNameErr"></span>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <div class="input-wrap">
+              <span class="ico">📧</span>
+              <input type="email" id="suEmail" placeholder="you@email.com" />
+            </div>
+            <span class="error-msg" id="suEmailErr"></span>
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <div class="input-wrap">
+              <span class="ico">📞</span>
+              <input type="text" id="suPhone" placeholder="10-digit number" />
+            </div>
+            <span class="error-msg" id="suPhoneErr"></span>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="ico">🔒</span>
+              <input type="password" id="suPass" placeholder="Min 6 characters" />
+              <span class="toggle-pw" onclick="togglePw('suPass',this)">👁️</span>
+            </div>
+            <span class="error-msg" id="suPassErr"></span>
+          </div>
+          <button class="btn-login" onclick="signupUser()">Create Account →</button>
+          <div class="divider">or</div>
+          <div class="signup-row">Already have an account? <a href="#" onclick="showForm('userLogin')">Log In</a></div>
+        </div>
+
+      </div>
+
+      <!-- ══ ADMIN LOGIN ══ -->
+      <div class="form-section" id="adminSection">
+        <div class="admin-hint">🛡️ Admin access only — use your credentials below.</div>
+        <div class="section-label">Admin Portal</div>
+        <div class="field">
+          <label>Admin ID</label>
+          <div class="input-wrap">
+            <span class="ico">🆔</span>
+            <input type="text" id="aId" placeholder="e.g. admin@ecopickup" />
+          </div>
+          <span class="error-msg" id="aIdErr"></span>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="ico">🔒</span>
+            <input type="password" id="aPass" placeholder="Admin password" />
+            <span class="toggle-pw" onclick="togglePw('aPass',this)">👁️</span>
+          </div>
+          <span class="error-msg" id="aPassErr"></span>
+        </div>
+        <button class="btn-login" onclick="loginAdmin()">Access Admin Panel →</button>
+        <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--soft);font-weight:700;">
+          Demo: admin@ecopickup / admin123
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* ── Role Tab Switch ── */
+    function switchRole(role) {
+      document.querySelectorAll('.role-tab').forEach((t, i) => {
+        t.classList.toggle('active', (i === 0 && role === 'user') || (i === 1 && role === 'admin'));
+      });
+      document.getElementById('userSection').classList.toggle('active', role === 'user');
+      document.getElementById('adminSection').classList.toggle('active', role === 'admin');
+    }
+
+    /* ── Show sub-form (login / signup) ── */
+    function showForm(id) {
+      document.querySelectorAll('.toggle-form').forEach(f => f.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    /* ── Password visibility ── */
+    function togglePw(id, el) {
+      const inp = document.getElementById(id);
+      if (inp.type === 'password') { inp.type = 'text'; el.textContent = '🙈'; }
+      else { inp.type = 'password'; el.textContent = '👁️'; }
+    }
+
+    /* ── Helpers ── */
+    function clrErr(...ids) { ids.forEach(id => { const e = document.getElementById(id); if (e) e.textContent = ''; }); }
+    function setErr(id, msg) { const e = document.getElementById(id); if (e) e.textContent = msg; }
+    function v(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
+
+    /* ── User Login ── */
+    function loginUser() {
+      clrErr('uEmailErr', 'uPassErr');
+      const email = v('uEmail'), pass = v('uPass');
+      let ok = true;
+      if (!email) { setErr('uEmailErr', 'Email or phone is required'); ok = false; }
+      if (!pass) { setErr('uPassErr', 'Password is required'); ok = false; }
+      if (!ok) return;
+
+      // Check stored users
+      const users = JSON.parse(localStorage.getItem('eco_users') || '[]');
+      const found = users.find(u => (u.email === email || u.phone === email) && u.password === pass);
+      if (!found) { setErr('uPassErr', 'Invalid credentials. Please try again.'); return; }
+
+      // Store session
+      localStorage.setItem('eco_session', JSON.stringify({ role: 'user', ...found }));
+      window.location.href = 'index.html';
+    }
+
+    /* ── User Signup ── */
+    function signupUser() {
+      clrErr('suNameErr', 'suEmailErr', 'suPhoneErr', 'suPassErr');
+      const name = v('suName'), email = v('suEmail'), phone = v('suPhone'), pass = v('suPass');
+      let ok = true;
+      if (!name) { setErr('suNameErr', 'Name is required'); ok = false; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('suEmailErr', 'Enter a valid email'); ok = false; }
+      if (!/^\d{10}$/.test(phone)) { setErr('suPhoneErr', 'Enter a valid 10-digit phone'); ok = false; }
+      if (pass.length < 6) { setErr('suPassErr', 'Password must be at least 6 characters'); ok = false; }
+      if (!ok) return;
+
+      const users = JSON.parse(localStorage.getItem('eco_users') || '[]');
+      if (users.find(u => u.email === email)) { setErr('suEmailErr', 'Email already registered'); return; }
+
+      const newUser = { id: 'USR' + Date.now(), name, email, phone, password: pass, joinedAt: new Date().toISOString(), avatar: '🌿' };
+      users.push(newUser);
+      localStorage.setItem('eco_users', JSON.stringify(users));
+      localStorage.setItem('eco_session', JSON.stringify({ role: 'user', ...newUser }));
+      window.location.href = 'index.html';
+    }
+
+    /* ── Admin Login ── */
+    function loginAdmin() {
+      clrErr('aIdErr', 'aPassErr');
+      const id = v('aId'), pass = v('aPass');
+      let ok = true;
+      if (!id) { setErr('aIdErr', 'Admin ID is required'); ok = false; }
+      if (!pass) { setErr('aPassErr', 'Password is required'); ok = false; }
+      if (!ok) return;
+
+      // Demo admin credentials
+      if (id === 'admin@ecopickup' && pass === 'admin123') {
+        localStorage.setItem('eco_session', JSON.stringify({
+          role: 'admin', name: 'Admin', email: 'admin@ecopickup', avatar: '🛡️'
+        }));
+        window.location.href = 'adminprofile.html';
+      } else {
+        setErr('aPassErr', 'Invalid admin credentials');
+      }
+    }
+  </script>
+</body>
+
+</html>
