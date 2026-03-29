@@ -137,6 +137,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       let session = JSON.parse(localStorage.getItem('eco_session') || 'null');
 
+      // Redirect to login if not logged in
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+
       const allReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
       const myReqs = session ? allReqs.filter(r => r.userId === session.id) : [];
 
