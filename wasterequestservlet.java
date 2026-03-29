@@ -36,7 +36,7 @@ class WasteRequest {
     this.address     = address;
     this.wasteType   = wasteType;
     this.pickupDate  = pickupDate;
-    this.status      = "Pending";           // default status
+    this.status      = "Pending";
     this.submittedAt = LocalDate.now().toString();
   }
 
@@ -48,19 +48,18 @@ class WasteRequest {
 }
 
 /* ──────────────────────────────────────────────
-   2. DATABASE HELPER
-   (Member 3 provides DB — this class connects)
+   2. DATABASE HELPER  →  Oracle XE
 ────────────────────────────────────────────── */
 class DBHelper {
-  private static final String URL  = "jdbc:mysql://localhost:3306/ecopickup";
-  private static final String USER = "root";
-  private static final String PASS = "";   // change to your MySQL password
+  private static final String URL  = "jdbc:oracle:thin:@localhost:1521:xe";
+  private static final String USER = "system";
+  private static final String PASS = "1234";
 
   public static Connection getConnection() throws SQLException {
     try {
-      Class.forName("com.mysql.cj.jdbc.Driver");
+      Class.forName("oracle.jdbc.driver.OracleDriver");
     } catch (ClassNotFoundException e) {
-      throw new SQLException("MySQL Driver not found", e);
+      throw new SQLException("Oracle Driver not found", e);
     }
     return DriverManager.getConnection(URL, USER, PASS);
   }
@@ -147,11 +146,11 @@ public class WasteRequestServlet extends HttpServlet {
   /* Validate all fields */
   private String validate(String name, String phone, String address,
                            String wasteType, String date) {
-    if (name    == null || name.trim().isEmpty())     return "Name is required";
-    if (phone   == null || !phone.matches("\\d{10}")) return "Enter a valid 10-digit phone number";
-    if (address == null || address.trim().isEmpty())   return "Address is required";
+    if (name    == null || name.trim().isEmpty())      return "Name is required";
+    if (phone   == null || !phone.matches("\\d{10}"))  return "Enter a valid 10-digit phone number";
+    if (address == null || address.trim().isEmpty())    return "Address is required";
     if (wasteType == null || wasteType.trim().isEmpty()) return "Please select a waste type";
-    if (date    == null || date.trim().isEmpty())      return "Please select a pickup date";
+    if (date    == null || date.trim().isEmpty())       return "Please select a pickup date";
 
     // Date must not be in the past
     try {
@@ -164,9 +163,9 @@ public class WasteRequestServlet extends HttpServlet {
     return null; // all valid
   }
 
-  /* Add new request to DB */
+  /* Add new request to Oracle DB */
   private boolean addRequest(WasteRequest r) {
-    String sql = "INSERT INTO requests(id, name, phone, address, waste_type, date, status, submitted_at) "
+    String sql = "INSERT INTO requests(id, name, phone, address, waste_type, pickup_date, status, submitted_at) "
                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     try (Connection con = DBHelper.getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
@@ -186,7 +185,7 @@ public class WasteRequestServlet extends HttpServlet {
     }
   }
 
-  /* Fetch single request by ID */
+  /* Fetch single request by ID from Oracle DB */
   private WasteRequest fetchRequest(String id) {
     String sql = "SELECT * FROM requests WHERE id = ?";
     try (Connection con = DBHelper.getConnection();
@@ -200,7 +199,7 @@ public class WasteRequestServlet extends HttpServlet {
         r.phone       = rs.getString("phone");
         r.address     = rs.getString("address");
         r.wasteType   = rs.getString("waste_type");
-        r.pickupDate  = rs.getString("date");
+        r.pickupDate  = rs.getString("pickup_date");   // renamed from "date"
         r.status      = rs.getString("status");
         r.submittedAt = rs.getString("submitted_at");
         return r;
@@ -215,13 +214,13 @@ public class WasteRequestServlet extends HttpServlet {
   private String toJson(WasteRequest r) {
     return "{"
       + "\"success\":true,"
-      + "\"id\":\""         + r.id          + "\","
-      + "\"name\":\""       + r.name        + "\","
-      + "\"phone\":\""      + r.phone       + "\","
-      + "\"address\":\""    + r.address     + "\","
-      + "\"wasteType\":\""  + r.wasteType   + "\","
-      + "\"pickupDate\":\"" + r.pickupDate  + "\","
-      + "\"status\":\""     + r.status      + "\","
+      + "\"id\":\""          + r.id          + "\","
+      + "\"name\":\""        + r.name        + "\","
+      + "\"phone\":\""       + r.phone       + "\","
+      + "\"address\":\""     + r.address     + "\","
+      + "\"wasteType\":\""   + r.wasteType   + "\","
+      + "\"pickupDate\":\""  + r.pickupDate  + "\","
+      + "\"status\":\""      + r.status      + "\","
       + "\"submittedAt\":\"" + r.submittedAt + "\""
       + "}";
   }
