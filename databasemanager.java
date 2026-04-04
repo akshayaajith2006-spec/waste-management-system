@@ -1,40 +1,29 @@
-/* ================================================================
-   EcoPickup · DatabaseManager.java
-   Member 3 – Database & Integration
-   Role: Manage all data storage and retrieval
-   Technology: MySQL + JDBC
-   ================================================================ */
-
 import java.sql.*;
 import java.util.*;
 
 public class DatabaseManager {
 
-  /* ── Connection config ────────────────────────────────── */
-  private static final String URL      = "jdbc:mysql://localhost:3306/ecopickup";
-  private static final String USERNAME = "root";
-  private static final String PASSWORD = "";     // set your MySQL password here
+  /* Oracle connection config */
+  private static final String URL      = "jdbc:oracle:thin:@localhost:1521:xe";
+  private static final String USERNAME = "system";
+  private static final String PASSWORD = "1234";
 
-  /* ── Get DB connection ───────────────────────────────── */
+  /* Get DB connection */
   public static Connection getConnection() throws SQLException {
     try {
-      Class.forName("com.mysql.cj.jdbc.Driver");
+      Class.forName("oracle.jdbc.driver.OracleDriver");
     } catch (ClassNotFoundException e) {
-      throw new SQLException("MySQL JDBC Driver not found. Add mysql-connector-j.jar to classpath.", e);
+      throw new SQLException("Oracle JDBC Driver not found. Add ojdbc.jar to classpath.", e);
     }
     return DriverManager.getConnection(URL, USERNAME, PASSWORD);
   }
 
-  /* ════════════════════════════════════════════════════════
-     REQUESTS TABLE — CRUD OPERATIONS
-  ════════════════════════════════════════════════════════ */
-
-  /* ── INSERT: Save a new request ─────────────────────── */
+  /* INSERT: Save a new request */
   public static boolean insertRequest(String id, String name, String phone,
       String address, String wasteType, String date, String submittedAt) {
 
-    String sql = "INSERT INTO requests (id, name, phone, address, waste_type, date, status, submitted_at) "
-               + "VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?)";
+    String sql = "INSERT INTO REQUESTS (ID, NAME, PHONE, ADDRESS, WASTE_TYPE, PICKUP_DATE, STATUS, SUBMITTED_AT) "
+               + "VALUES (?, ?, ?, ?, ?, TO_DATE(?,'YYYY-MM-DD'), 'Pending', TO_DATE(?,'YYYY-MM-DD'))";
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
@@ -57,9 +46,9 @@ public class DatabaseManager {
     }
   }
 
-  /* ── SELECT: Get request by ID ──────────────────────── */
+  /* SELECT: Get request by ID */
   public static Map<String, String> getRequestById(String id) {
-    String sql = "SELECT * FROM requests WHERE id = ?";
+    String sql = "SELECT * FROM REQUESTS WHERE ID = ?";
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
@@ -69,26 +58,26 @@ public class DatabaseManager {
 
       if (rs.next()) {
         Map<String, String> row = new LinkedHashMap<>();
-        row.put("id",           rs.getString("id"));
-        row.put("name",         rs.getString("name"));
-        row.put("phone",        rs.getString("phone"));
-        row.put("address",      rs.getString("address"));
-        row.put("wasteType",    rs.getString("waste_type"));
-        row.put("pickupDate",   rs.getString("date"));
-        row.put("status",       rs.getString("status"));
-        row.put("submittedAt",  rs.getString("submitted_at"));
+        row.put("id",          rs.getString("ID"));
+        row.put("name",        rs.getString("NAME"));
+        row.put("phone",       rs.getString("PHONE"));
+        row.put("address",     rs.getString("ADDRESS"));
+        row.put("wasteType",   rs.getString("WASTE_TYPE"));
+        row.put("pickupDate",  rs.getString("PICKUP_DATE"));
+        row.put("status",      rs.getString("STATUS"));
+        row.put("submittedAt", rs.getString("SUBMITTED_AT"));
         return row;
       }
 
     } catch (SQLException e) {
       System.err.println("❌ Fetch failed: " + e.getMessage());
     }
-    return null; // not found
+    return null;
   }
 
-  /* ── SELECT: Get all requests ───────────────────────── */
+  /* SELECT: Get all requests */
   public static List<Map<String, String>> getAllRequests() {
-    String sql = "SELECT * FROM requests ORDER BY submitted_at DESC";
+    String sql = "SELECT * FROM REQUESTS ORDER BY SUBMITTED_AT DESC";
     List<Map<String, String>> list = new ArrayList<>();
 
     try (Connection con = getConnection();
@@ -97,14 +86,14 @@ public class DatabaseManager {
 
       while (rs.next()) {
         Map<String, String> row = new LinkedHashMap<>();
-        row.put("id",          rs.getString("id"));
-        row.put("name",        rs.getString("name"));
-        row.put("phone",       rs.getString("phone"));
-        row.put("address",     rs.getString("address"));
-        row.put("wasteType",   rs.getString("waste_type"));
-        row.put("pickupDate",  rs.getString("date"));
-        row.put("status",      rs.getString("status"));
-        row.put("submittedAt", rs.getString("submitted_at"));
+        row.put("id",          rs.getString("ID"));
+        row.put("name",        rs.getString("NAME"));
+        row.put("phone",       rs.getString("PHONE"));
+        row.put("address",     rs.getString("ADDRESS"));
+        row.put("wasteType",   rs.getString("WASTE_TYPE"));
+        row.put("pickupDate",  rs.getString("PICKUP_DATE"));
+        row.put("status",      rs.getString("STATUS"));
+        row.put("submittedAt", rs.getString("SUBMITTED_AT"));
         list.add(row);
       }
 
@@ -114,16 +103,15 @@ public class DatabaseManager {
     return list;
   }
 
-  /* ── UPDATE: Change request status ─────────────────── */
+  /* UPDATE: Change request status */
   public static boolean updateStatus(String id, String newStatus) {
-    // Validate allowed statuses
     List<String> allowed = Arrays.asList("Pending", "In Progress", "Done");
     if (!allowed.contains(newStatus)) {
       System.err.println("❌ Invalid status: " + newStatus);
       return false;
     }
 
-    String sql = "UPDATE requests SET status = ? WHERE id = ?";
+    String sql = "UPDATE REQUESTS SET STATUS = ? WHERE ID = ?";
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
@@ -140,9 +128,9 @@ public class DatabaseManager {
     }
   }
 
-  /* ── SELECT: Count by status ────────────────────────── */
+  /* SELECT: Count by status */
   public static Map<String, Integer> getStatusCounts() {
-    String sql = "SELECT status, COUNT(*) AS cnt FROM requests GROUP BY status";
+    String sql = "SELECT STATUS, COUNT(*) AS CNT FROM REQUESTS GROUP BY STATUS";
     Map<String, Integer> counts = new HashMap<>();
     counts.put("Pending",     0);
     counts.put("In Progress", 0);
@@ -153,7 +141,7 @@ public class DatabaseManager {
          ResultSet rs = ps.executeQuery()) {
 
       while (rs.next()) {
-        counts.put(rs.getString("status"), rs.getInt("cnt"));
+        counts.put(rs.getString("STATUS"), rs.getInt("CNT"));
       }
 
     } catch (SQLException e) {
@@ -162,15 +150,12 @@ public class DatabaseManager {
     return counts;
   }
 
-  /* ════════════════════════════════════════════════════════
-     USERS TABLE — CRUD OPERATIONS
-  ════════════════════════════════════════════════════════ */
-
-  /* ── INSERT: Register new user ──────────────────────── */
+  /* INSERT: Register new user */
   public static boolean insertUser(String id, String name, String email,
-      String phone, String password, String avatar) {
+      String phone, String password) {
 
-    String sql = "INSERT INTO users (id, name, email, phone, password, avatar) VALUES (?,?,?,?,?,?)";
+    String sql = "INSERT INTO USERS (ID, NAME, EMAIL, PHONE, PASSWORD, JOINED_AT) "
+               + "VALUES (?, ?, ?, ?, ?, SYSDATE)";
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
@@ -179,8 +164,7 @@ public class DatabaseManager {
       ps.setString(2, name);
       ps.setString(3, email);
       ps.setString(4, phone);
-      ps.setString(5, password);   // hash this in production!
-      ps.setString(6, avatar);
+      ps.setString(5, password);
       ps.executeUpdate();
       System.out.println("✅ User registered: " + email);
       return true;
@@ -191,9 +175,9 @@ public class DatabaseManager {
     }
   }
 
-  /* ── SELECT: Login check ─────────────────────────────── */
+  /* SELECT: Login check */
   public static Map<String, String> loginUser(String email, String password) {
-    String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+    String sql = "SELECT * FROM USERS WHERE EMAIL = ? AND PASSWORD = ?";
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
@@ -204,34 +188,31 @@ public class DatabaseManager {
 
       if (rs.next()) {
         Map<String, String> user = new LinkedHashMap<>();
-        user.put("id",       rs.getString("id"));
-        user.put("name",     rs.getString("name"));
-        user.put("email",    rs.getString("email"));
-        user.put("phone",    rs.getString("phone"));
-        user.put("avatar",   rs.getString("avatar"));
-        user.put("joinedAt", rs.getString("joined_at"));
+        user.put("id",       rs.getString("ID"));
+        user.put("name",     rs.getString("NAME"));
+        user.put("email",    rs.getString("EMAIL"));
+        user.put("phone",    rs.getString("PHONE"));
+        user.put("joinedAt", rs.getString("JOINED_AT"));
         return user;
       }
 
     } catch (SQLException e) {
       System.err.println("❌ Login failed: " + e.getMessage());
     }
-    return null; // invalid credentials
+    return null;
   }
 
-  /* ── MAIN: Quick test ────────────────────────────────── */
+  /* MAIN: Test connection */
   public static void main(String[] args) {
     System.out.println("=== EcoPickup DB Test ===\n");
 
-    // Test connection
     try (Connection con = getConnection()) {
-      System.out.println("✅ Database connected!\n");
+      System.out.println("✅ Oracle Database connected!\n");
     } catch (SQLException e) {
       System.err.println("❌ Cannot connect: " + e.getMessage());
       return;
     }
 
-    // Test fetch
     System.out.println("--- All Requests ---");
     List<Map<String, String>> all = getAllRequests();
     for (Map<String, String> r : all) {
@@ -239,7 +220,6 @@ public class DatabaseManager {
           r.get("id"), r.get("name"), r.get("wasteType"), r.get("status"));
     }
 
-    // Test status counts
     System.out.println("\n--- Status Summary ---");
     Map<String, Integer> counts = getStatusCounts();
     counts.forEach((k, v) -> System.out.println("  " + k + ": " + v));
