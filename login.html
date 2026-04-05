@@ -5,551 +5,201 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>EcoPickup – Login</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-
-<!-- ✅ FIREBASE SDK (v9 compat mode - paste your config below) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
+<script>
+// Initialize Firebase ONCE here in <head> so it's ready for everything
+const firebaseConfig = {
+  apiKey: "AIzaSyBtGUzli0ioW8lrbgWHb7tTbqaiuLIMZtQ",
+  authDomain: "waste-management-system-7b2d4.firebaseapp.com",
+  projectId: "waste-management-system-7b2d4",
+  storageBucket: "waste-management-system-7b2d4.firebasestorage.app",
+  messagingSenderId: "791452329907",
+  appId: "1:791452329907:web:9f1909e3d2bff35f354dc6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+</script>
 <style>
-:root {
-  --g-dark: #064e35;
-  --g-mid: #059669;
-  --g-base: #10b981;
-  --g-light: #34d399;
-  --gold: #d4af37;
-  --gold-mid: #e8c547;
-  --gold-lite: #f0d060;
-  --bg: #f4fdf7;
-  --card: #ffffff;
-  --text: #0c2116;
-  --soft: #5a7a65;
-  --border: #c6f0d9;
-  --error: #dc2626;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-a { text-decoration: none; color: inherit; }
-
-body {
-  font-family: 'Nunito', sans-serif;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* ✅ FIX: was 'center' - now allows scroll */
-  background: #0a1f0e;
-  position: relative;
-  overflow-y: auto; /* ✅ FIX: scrolling enabled on body */
-  padding: 20px 16px;
-}
-
-/* BG mesh */
-.mesh {
-  position: fixed; /* fixed so it doesn't scroll */
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 60% at 15% 20%, rgba(16,185,129,0.3) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 85% 75%, rgba(212,175,55,0.22) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 70% 10%, rgba(5,150,105,0.18) 0%, transparent 60%);
-  animation: meshMove 10s ease-in-out infinite;
-  z-index: 0;
-}
-@keyframes meshMove { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.85;transform:scale(1.04)} }
-
-.noise {
-  position: fixed;
-  inset: 0;
-  opacity: .03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  z-index: 0;
-}
-
-.orb { position: fixed; border-radius: 50%; filter: blur(70px); pointer-events: none; z-index: 0; }
-.orb-1 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(16,185,129,.35), transparent); top: -80px; left: -60px; animation: orbf 9s ease-in-out infinite; }
-.orb-2 { width: 220px; height: 220px; background: radial-gradient(circle, rgba(212,175,55,.28), transparent); bottom: -60px; right: -40px; animation: orbf 11s ease-in-out infinite -4s; }
-@keyframes orbf { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,-25px)} }
-
-/* ── Card ── */
-.login-card {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 440px;
-  margin: auto; /* ✅ centers horizontally */
-  background: rgba(255,255,255,0.97);
-  border-radius: 28px;
-  overflow: visible; /* ✅ FIX: was 'hidden' - caused content clip on signup */
-  box-shadow: 0 30px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,175,55,0.15);
-}
-
-/* Gold top bar */
-.gold-bar { height: 4px; border-radius: 28px 28px 0 0; background: linear-gradient(90deg,#10b981,#d4af37,#10b981); background-size:200%; animation: barShimmer 3s ease-in-out infinite; }
-@keyframes barShimmer { 0%,100%{background-position:0%} 50%{background-position:100%} }
-
-/* ── Header ── */
-.card-head {
-  background: linear-gradient(135deg, #064e35 0%, #059669 55%, #0d9488 100%);
-  padding: 32px 28px 40px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  border-radius: 24px 24px 0 0;
-}
-.card-head::after {
-  content: '';
-  position: absolute;
-  bottom: -20px; left: -20px; right: -20px;
-  height: 40px;
-  background: rgba(255,255,255,0.97);
-  border-radius: 50%;
-}
-
-.brand-logo { font-size: 52px; display: inline-block; margin-bottom: 10px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3)); animation: logoFloat 4s ease-in-out infinite; }
-@keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-.brand-name { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; color:white; letter-spacing:-0.5px; }
+:root { --g-dark:#064e35; --g-mid:#059669; --g-base:#10b981; --gold:#d4af37; --text:#0c2116; --soft:#5a7a65; --border:#c6f0d9; --error:#dc2626; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; min-height:100vh; display:flex; justify-content:center; align-items:flex-start; background:#0a1f0e; overflow-y:auto; padding:20px 16px; }
+.mesh { position:fixed; inset:0; background: radial-gradient(ellipse 70% 60% at 15% 20%, rgba(16,185,129,0.3) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 85% 75%, rgba(212,175,55,0.22) 0%, transparent 60%); z-index:0; }
+.orb { position:fixed; border-radius:50%; filter:blur(70px); pointer-events:none; z-index:0; }
+.orb-1 { width:280px; height:280px; background:radial-gradient(circle,rgba(16,185,129,.35),transparent); top:-80px; left:-60px; }
+.orb-2 { width:220px; height:220px; background:radial-gradient(circle,rgba(212,175,55,.28),transparent); bottom:-60px; right:-40px; }
+.login-card { position:relative; z-index:10; width:100%; max-width:440px; margin:auto; background:rgba(255,255,255,0.97); border-radius:28px; overflow:visible; box-shadow:0 30px 80px rgba(0,0,0,0.35); }
+.gold-bar { height:4px; border-radius:28px 28px 0 0; background:linear-gradient(90deg,#10b981,#d4af37,#10b981); }
+.card-head { background:linear-gradient(135deg,#064e35 0%,#059669 55%,#0d9488 100%); padding:32px 28px 40px; text-align:center; position:relative; overflow:hidden; border-radius:24px 24px 0 0; }
+.card-head::after { content:''; position:absolute; bottom:-20px; left:-20px; right:-20px; height:40px; background:rgba(255,255,255,0.97); border-radius:50%; }
+.brand-logo { font-size:52px; display:inline-block; margin-bottom:10px; }
+.brand-name { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; color:white; }
 .brand-name span { background:linear-gradient(135deg,#f0d060,#d4af37); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .brand-sub { font-size:11px; font-weight:700; color:rgba(255,255,255,0.65); letter-spacing:3px; text-transform:uppercase; margin-top:4px; }
-
-/* ── Tab switcher ── */
-.card-body { padding: 28px 28px 32px; }
-
+.card-body { padding:28px 28px 32px; }
 .role-tabs { display:flex; background:#f0fdf4; border:1.5px solid var(--border); border-radius:14px; padding:4px; margin-bottom:26px; gap:4px; }
 .role-tab { flex:1; padding:11px 8px; border-radius:10px; font-size:13px; font-weight:800; text-align:center; cursor:pointer; transition:all .3s; color:var(--soft); border:none; background:transparent; font-family:'Nunito',sans-serif; display:flex; align-items:center; justify-content:center; gap:6px; }
 .role-tab.active { background:linear-gradient(135deg,var(--g-dark),var(--g-mid)); color:white; box-shadow:0 6px 18px rgba(5,150,105,0.3); }
-
-/* ── Form ── */
-.form-section { display:none; }
-.form-section.active { display:block; animation:fadeIn .35s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
+.form-section { display:none; } .form-section.active { display:block; }
 .section-label { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:var(--g-dark); margin-bottom:18px; }
-
 .field { margin-bottom:16px; }
 .field label { display:block; font-size:11px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:.6px; margin-bottom:7px; }
 .input-wrap { display:flex; align-items:center; gap:10px; background:#f6fef9; border:1.5px solid var(--border); border-radius:12px; padding:13px 16px; transition:all .3s; }
 .input-wrap:focus-within { border-color:var(--g-base); background:white; box-shadow:0 0 0 4px rgba(16,185,129,.1); }
 .input-wrap .ico { font-size:17px; flex-shrink:0; }
 .input-wrap input { border:none; background:transparent; outline:none; font-size:15px; font-family:'Nunito',sans-serif; width:100%; color:var(--text); font-weight:600; }
-.toggle-pw { font-size:16px; cursor:pointer; flex-shrink:0; opacity:.5; transition:opacity .2s; }
-.toggle-pw:hover { opacity:1; }
+.toggle-pw { font-size:16px; cursor:pointer; flex-shrink:0; opacity:.5; }
 .error-msg { color:var(--error); font-size:11px; font-weight:700; margin-top:5px; display:block; }
 .admin-hint { background:linear-gradient(135deg,#fef9e7,#fef3c7); border:1px solid rgba(212,175,55,.35); border-radius:12px; padding:12px 14px; font-size:12px; font-weight:700; color:#78350f; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
-
-/* ✅ Toast notification */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(60px);
-  background: var(--g-dark);
-  color: white;
-  padding: 12px 24px;
-  border-radius: 50px;
-  font-weight: 700;
-  font-size: 13px;
-  z-index: 9999;
-  transition: transform 0.4s ease;
-  white-space: nowrap;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast.error { background: var(--error); }
-
-/* Submit btn */
-.btn-login { width:100%; padding:15px; background:linear-gradient(135deg,#059669,#10b981); color:white; border:none; border-radius:13px; font-size:15px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .3s; box-shadow:0 8px 24px rgba(5,150,105,.3); position:relative; overflow:hidden; letter-spacing:.3px; }
-.btn-login::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(212,175,55,.6),transparent); }
-.btn-login:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 12px 32px rgba(5,150,105,.4); }
-.btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
-
-.divider { text-align:center; margin:18px 0; font-size:12px; color:var(--soft); font-weight:700; position:relative; }
-.divider::before,.divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:linear-gradient(90deg,transparent,var(--border)); }
-.divider::before { left:0; }
-.divider::after { right:0; background:linear-gradient(90deg,var(--border),transparent); }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--g-dark); color:white; padding:12px 24px; border-radius:50px; font-weight:700; font-size:13px; z-index:9999; transition:transform 0.4s ease; white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); } .toast.error { background:var(--error); }
+.btn-login { width:100%; padding:15px; background:linear-gradient(135deg,#059669,#10b981); color:white; border:none; border-radius:13px; font-size:15px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .3s; box-shadow:0 8px 24px rgba(5,150,105,.3); }
+.btn-login:hover:not(:disabled) { transform:translateY(-2px); } .btn-login:disabled { opacity:0.6; cursor:not-allowed; }
+.divider { text-align:center; margin:18px 0; font-size:12px; color:var(--soft); font-weight:700; }
 .signup-row { text-align:center; font-size:13px; color:var(--soft); font-weight:700; }
 .signup-row a { color:var(--g-base); font-weight:800; cursor:pointer; }
-.signup-row a:hover { text-decoration:underline; }
-
-.toggle-form { display:none; }
-.toggle-form.active { display:block; }
-
-/* ── ✅ RESPONSIVE STYLES ── */
-
-/* Tablet */
-@media (max-width: 600px) {
-  body { padding: 12px; align-items: flex-start; }
-  .login-card { max-width: 100%; border-radius: 20px; }
-  .card-head { padding: 24px 20px 36px; }
-  .brand-logo { font-size: 44px; }
-  .brand-name { font-size: 24px; }
-  .card-body { padding: 20px 20px 28px; }
-  .role-tab { font-size: 12px; padding: 10px 6px; }
-}
-
-/* Mobile */
-@media (max-width: 400px) {
-  body { padding: 8px; }
-  .login-card { border-radius: 16px; }
-  .card-head { padding: 20px 16px 34px; }
-  .brand-logo { font-size: 38px; }
-  .brand-name { font-size: 22px; }
-  .brand-sub { font-size: 10px; letter-spacing: 2px; }
-  .card-body { padding: 16px 16px 24px; }
-  .role-tabs { margin-bottom: 20px; }
-  .role-tab { font-size: 11px; padding: 9px 4px; gap: 4px; }
-  .input-wrap { padding: 11px 12px; }
-  .input-wrap input { font-size: 14px; }
-  .btn-login { font-size: 14px; padding: 13px; }
-  .section-label { font-size: 15px; }
-}
+.toggle-form { display:none; } .toggle-form.active { display:block; }
+@media (max-width:600px) { body { padding:12px; } .login-card { max-width:100%; border-radius:20px; } .card-body { padding:20px 20px 28px; } }
 </style>
 </head>
-
 <body>
 <div class="mesh"></div>
-<div class="noise"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
-
-<!-- Toast notification -->
 <div class="toast" id="toast"></div>
-
 <div class="login-card">
   <div class="gold-bar"></div>
-
-  <!-- Header -->
   <div class="card-head">
     <div class="brand-logo">🌍</div>
     <div class="brand-name">Eco<span>Pickup</span></div>
     <div class="brand-sub">Smart Waste Management</div>
   </div>
-
   <div class="card-body">
-    <!-- Role tabs -->
     <div class="role-tabs">
       <button class="role-tab active" onclick="switchRole('user')">👤 User</button>
       <button class="role-tab" onclick="switchRole('admin')">🛡️ Admin</button>
     </div>
-
-    <!-- ══ USER SECTION ══ -->
     <div class="form-section active" id="userSection">
-
-      <!-- Login Form -->
       <div class="toggle-form active" id="userLogin">
         <div class="section-label">Welcome back 👋</div>
-        <div class="field">
-          <label>Email</label>
-          <div class="input-wrap">
-            <span class="ico">📧</span>
-            <input type="email" id="uEmail" placeholder="you@email.com" />
-          </div>
-          <span class="error-msg" id="uEmailErr"></span>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="input-wrap">
-            <span class="ico">🔒</span>
-            <input type="password" id="uPass" placeholder="Your password" />
-            <span class="toggle-pw" onclick="togglePw('uPass',this)">👁️</span>
-          </div>
-          <span class="error-msg" id="uPassErr"></span>
-        </div>
+        <div class="field"><label>Email</label><div class="input-wrap"><span class="ico">📧</span><input type="email" id="uEmail" placeholder="you@email.com" /></div><span class="error-msg" id="uEmailErr"></span></div>
+        <div class="field"><label>Password</label><div class="input-wrap"><span class="ico">🔒</span><input type="password" id="uPass" placeholder="Your password" /><span class="toggle-pw" onclick="togglePw('uPass',this)">👁️</span></div><span class="error-msg" id="uPassErr"></span></div>
         <button class="btn-login" id="loginBtn" onclick="loginUser()">Login as User →</button>
         <div class="divider">or</div>
         <div class="signup-row">Don't have an account? <a onclick="showForm('userSignup')">Sign Up</a></div>
       </div>
-
-      <!-- ✅ Sign Up Form (scrollable because body scrolls now) -->
       <div class="toggle-form" id="userSignup">
         <div class="section-label">Create Account 🌱</div>
-        <div class="field">
-          <label>Full Name</label>
-          <div class="input-wrap">
-            <span class="ico">👤</span>
-            <input type="text" id="suName" placeholder="Your full name" />
-          </div>
-          <span class="error-msg" id="suNameErr"></span>
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <div class="input-wrap">
-            <span class="ico">📧</span>
-            <input type="email" id="suEmail" placeholder="you@email.com" />
-          </div>
-          <span class="error-msg" id="suEmailErr"></span>
-        </div>
-        <div class="field">
-          <label>Phone</label>
-          <div class="input-wrap">
-            <span class="ico">📞</span>
-            <input type="text" id="suPhone" placeholder="10-digit number" />
-          </div>
-          <span class="error-msg" id="suPhoneErr"></span>
-        </div>
-        <div class="field">
-          <label>Address</label>
-          <div class="input-wrap">
-            <span class="ico">🏠</span>
-            <input type="text" id="suAddress" placeholder="Your address" />
-          </div>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="input-wrap">
-            <span class="ico">🔒</span>
-            <input type="password" id="suPass" placeholder="Min 6 characters" />
-            <span class="toggle-pw" onclick="togglePw('suPass',this)">👁️</span>
-          </div>
-          <span class="error-msg" id="suPassErr"></span>
-        </div>
+        <div class="field"><label>Full Name</label><div class="input-wrap"><span class="ico">👤</span><input type="text" id="suName" placeholder="Your full name" /></div><span class="error-msg" id="suNameErr"></span></div>
+        <div class="field"><label>Email</label><div class="input-wrap"><span class="ico">📧</span><input type="email" id="suEmail" placeholder="you@email.com" /></div><span class="error-msg" id="suEmailErr"></span></div>
+        <div class="field"><label>Phone</label><div class="input-wrap"><span class="ico">📞</span><input type="text" id="suPhone" placeholder="10-digit number" /></div><span class="error-msg" id="suPhoneErr"></span></div>
+        <div class="field"><label>Address</label><div class="input-wrap"><span class="ico">🏠</span><input type="text" id="suAddress" placeholder="Your address" /></div></div>
+        <div class="field"><label>Password</label><div class="input-wrap"><span class="ico">🔒</span><input type="password" id="suPass" placeholder="Min 6 characters" /><span class="toggle-pw" onclick="togglePw('suPass',this)">👁️</span></div><span class="error-msg" id="suPassErr"></span></div>
         <button class="btn-login" id="signupBtn" onclick="signupUser()">Create Account →</button>
         <div class="divider">or</div>
         <div class="signup-row">Already have an account? <a onclick="showForm('userLogin')">Log In</a></div>
       </div>
-
     </div>
-
-    <!-- ══ ADMIN SECTION ══ -->
     <div class="form-section" id="adminSection">
-      <div class="admin-hint">🛡️ Admin access only — use your credentials below.</div>
+      <div class="admin-hint">🛡️ Admin access only</div>
       <div class="section-label">Admin Portal</div>
-      <div class="field">
-        <label>Admin Email</label>
-        <div class="input-wrap">
-          <span class="ico">🆔</span>
-          <input type="email" id="aId" placeholder="admin@ecopickup.com" />
-        </div>
-        <span class="error-msg" id="aIdErr"></span>
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <div class="input-wrap">
-          <span class="ico">🔒</span>
-          <input type="password" id="aPass" placeholder="Admin password" />
-          <span class="toggle-pw" onclick="togglePw('aPass',this)">👁️</span>
-        </div>
-        <span class="error-msg" id="aPassErr"></span>
-      </div>
+      <div class="field"><label>Admin Email</label><div class="input-wrap"><span class="ico">🆔</span><input type="email" id="aId" placeholder="admin@ecopickup.com" /></div><span class="error-msg" id="aIdErr"></span></div>
+      <div class="field"><label>Password</label><div class="input-wrap"><span class="ico">🔒</span><input type="password" id="aPass" placeholder="Admin password" /><span class="toggle-pw" onclick="togglePw('aPass',this)">👁️</span></div><span class="error-msg" id="aPassErr"></span></div>
       <button class="btn-login" id="adminBtn" onclick="loginAdmin()">Access Admin Panel →</button>
     </div>
-
   </div>
 </div>
-
 <script>
-// =====================================================
-// ✅ FIREBASE CONFIGURATION
-// Steps to get your config:
-// 1. Go to https://console.firebase.google.com
-// 2. Create project → Add Web App → Copy config below
-// 3. Enable: Authentication (Email/Password) + Firestore
-// =====================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyAQTRW_YFVBCuuNlOe4wZ0rvEQnKDHrT-c",
-  authDomain: "waste-management-system-7b2d4.firebaseapp.com",
-  projectId: "waste-management-system-7b2d4",
-  storageBucket: "waste-management-system-7b2d4.firebasestorage.app",
-  messagingSenderId: "791452329907",
-  appId: "1:791452329907:web:9f1909e3d2bff35f354dc6",
-  measurementId: "G-EYLQ1WT1SJ"
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// Admin emails - add your admin email here
 const ADMIN_EMAILS = ["admin@ecopickup.com"];
-
-// ── UI Helpers ──
 function switchRole(role) {
-  document.querySelectorAll('.role-tab').forEach((t,i) => {
-    t.classList.toggle('active', (i===0 && role==='user') || (i===1 && role==='admin'));
-  });
-  document.getElementById('userSection').classList.toggle('active', role==='user');
-  document.getElementById('adminSection').classList.toggle('active', role==='admin');
+  document.querySelectorAll('.role-tab').forEach((t,i) => t.classList.toggle('active',(i===0&&role==='user')||(i===1&&role==='admin')));
+  document.getElementById('userSection').classList.toggle('active',role==='user');
+  document.getElementById('adminSection').classList.toggle('active',role==='admin');
 }
-
 function showForm(id) {
-  document.querySelectorAll('.toggle-form').forEach(f => f.classList.remove('active'));
+  document.querySelectorAll('.toggle-form').forEach(f=>f.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  // ✅ Scroll to top of card when switching forms
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-
-function togglePw(id, el) {
-  const inp = document.getElementById(id);
-  if (inp.type === 'password') { inp.type='text'; el.textContent='🙈'; }
-  else { inp.type='password'; el.textContent='👁️'; }
+function togglePw(id,el) {
+  const inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+  el.textContent=inp.type==='password'?'👁️':'🙈';
 }
-
-function clrErr(...ids) { ids.forEach(id => { const e=document.getElementById(id); if(e) e.textContent=''; }); }
-function setErr(id, msg) { const e=document.getElementById(id); if(e) e.textContent=msg; }
-function v(id) { const e=document.getElementById(id); return e ? e.value.trim() : ''; }
-
-function showToast(msg, isError=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (isError ? ' error' : '');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+function clrErr(...ids){ids.forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='';})}
+function setErr(id,msg){const e=document.getElementById(id);if(e)e.textContent=msg;}
+function v(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function showToast(msg,isError=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isError?' error':''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
+function resetBtn(id,txt){const b=document.getElementById(id);b.disabled=false;b.textContent=txt;}
 
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  if (loading) btn.textContent = '⏳ Please wait...';
-}
-
-// ── ✅ USER LOGIN (Firebase Auth) ──
-async function loginUser() {
-  clrErr('uEmailErr', 'uPassErr');
-  const email = v('uEmail'), pass = v('uPass');
-  let ok = true;
-  if (!email) { setErr('uEmailErr', 'Email is required'); ok=false; }
-  if (!pass)  { setErr('uPassErr',  'Password is required'); ok=false; }
-  if (!ok) return;
-
-  setLoading('loginBtn', true);
+async function loginUser(){
+  clrErr('uEmailErr','uPassErr');
+  const email=v('uEmail'),pass=v('uPass');
+  if(!email){setErr('uEmailErr','Email is required');return;}
+  if(!pass){setErr('uPassErr','Password is required');return;}
+  const btn=document.getElementById('loginBtn');
+  btn.disabled=true; btn.textContent='⏳ Please wait...';
   try {
-    const cred = await auth.signInWithEmailAndPassword(email, pass);
-    const user = cred.user;
-
-    // Check if admin trying to login as user
-    if (ADMIN_EMAILS.includes(user.email)) {
-      await auth.signOut();
-      setErr('uPassErr', 'Use the Admin tab to login.');
-      return;
-    }
-
-    // Store session info
-    const userDoc = await db.collection('users').doc(user.uid).get();
-    sessionStorage.setItem('eco_session', JSON.stringify({
-      role: 'user',
-      uid: user.uid,
-      email: user.email,
-      name: userDoc.exists ? userDoc.data().name : user.displayName || 'User'
-    }));
-
-    showToast('✅ Login successful! Redirecting...');
-    setTimeout(() => window.location.href = 'index.html', 1000);
-
-  } catch (err) {
-    const msg = err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
-      ? 'Invalid email or password'
-      : err.code === 'auth/too-many-requests'
-      ? 'Too many attempts. Try later.'
-      : err.message;
-    setErr('uPassErr', msg);
-    showToast('❌ Login failed', true);
-  } finally {
-    document.getElementById('loginBtn').disabled = false;
-    document.getElementById('loginBtn').textContent = 'Login as User →';
-  }
+    const cred=await auth.signInWithEmailAndPassword(email,pass);
+    if(ADMIN_EMAILS.includes(cred.user.email)){await auth.signOut();setErr('uPassErr','Use the Admin tab.');return;}
+    const ud=await db.collection('users').doc(cred.user.uid).get();
+    sessionStorage.setItem('eco_session',JSON.stringify({role:'user',uid:cred.user.uid,email:cred.user.email,name:ud.exists?ud.data().name:(cred.user.displayName||'User')}));
+    showToast('✅ Login successful!');
+    setTimeout(()=>window.location.href='index.html',1000);
+  } catch(err){
+    setErr('uPassErr',(err.code==='auth/wrong-password'||err.code==='auth/user-not-found')?'Invalid email or password':err.message);
+    showToast('❌ Login failed',true);
+  } finally { resetBtn('loginBtn','Login as User →'); }
 }
 
-// ── ✅ USER SIGNUP (Firebase Auth + Firestore) ──
-async function signupUser() {
+async function signupUser(){
   clrErr('suNameErr','suEmailErr','suPhoneErr','suPassErr');
-  const name=v('suName'), email=v('suEmail'), phone=v('suPhone'), pass=v('suPass'), address=v('suAddress');
-  let ok = true;
-  if (!name) { setErr('suNameErr','Name is required'); ok=false; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('suEmailErr','Enter a valid email'); ok=false; }
-  if (!/^\d{10}$/.test(phone)) { setErr('suPhoneErr','Enter a valid 10-digit phone'); ok=false; }
-  if (pass.length < 6) { setErr('suPassErr','Password must be at least 6 characters'); ok=false; }
-  if (!ok) return;
-
-  setLoading('signupBtn', true);
+  const name=v('suName'),email=v('suEmail'),phone=v('suPhone'),pass=v('suPass'),address=v('suAddress');
+  let ok=true;
+  if(!name){setErr('suNameErr','Name is required');ok=false;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setErr('suEmailErr','Enter a valid email');ok=false;}
+  if(!/^\d{10}$/.test(phone)){setErr('suPhoneErr','Enter a valid 10-digit phone');ok=false;}
+  if(pass.length<6){setErr('suPassErr','Min 6 characters');ok=false;}
+  if(!ok)return;
+  const btn=document.getElementById('signupBtn');
+  btn.disabled=true; btn.textContent='⏳ Creating...';
   try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    const user = cred.user;
-
-    // Update display name
-    await user.updateProfile({ displayName: name });
-
-    // ✅ Save extra user data to Firestore
-    await db.collection('users').doc(user.uid).set({
-      name,
-      email,
-      phone,
-      address: address || '',
-      role: 'user',
-      joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      avatar: '🌿'
-    });
-
-    sessionStorage.setItem('eco_session', JSON.stringify({
-      role: 'user', uid: user.uid, email, name
-    }));
-
-    showToast('🎉 Account created! Welcome to EcoPickup!');
-    setTimeout(() => window.location.href = 'index.html', 1200);
-
-  } catch (err) {
-    const msg = err.code === 'auth/email-already-in-use'
-      ? 'This email is already registered. Try logging in.'
-      : err.code === 'auth/weak-password'
-      ? 'Password is too weak'
-      : err.message;
-    setErr('suEmailErr', msg);
-    showToast('❌ Signup failed', true);
-  } finally {
-    document.getElementById('signupBtn').disabled = false;
-    document.getElementById('signupBtn').textContent = 'Create Account →';
-  }
+    const cred=await auth.createUserWithEmailAndPassword(email,pass);
+    await cred.user.updateProfile({displayName:name});
+    await db.collection('users').doc(cred.user.uid).set({name,email,phone,address:address||'',role:'user',joinedAt:firebase.firestore.FieldValue.serverTimestamp(),avatar:'🌿'});
+    sessionStorage.setItem('eco_session',JSON.stringify({role:'user',uid:cred.user.uid,email,name}));
+    showToast('🎉 Account created! Welcome!');
+    setTimeout(()=>window.location.href='index.html',1200);
+  } catch(err){
+    setErr('suPassErr',err.code==='auth/email-already-in-use'?'Email already registered. Please log in.':err.message);
+    showToast('❌ Signup failed',true);
+  } finally { resetBtn('signupBtn','Create Account →'); }
 }
 
-// ── ✅ ADMIN LOGIN (Firebase Auth with role check) ──
-async function loginAdmin() {
+async function loginAdmin(){
   clrErr('aIdErr','aPassErr');
-  const email=v('aId'), pass=v('aPass');
-  let ok = true;
-  if (!email) { setErr('aIdErr','Admin email is required'); ok=false; }
-  if (!pass)  { setErr('aPassErr','Password is required'); ok=false; }
-  if (!ok) return;
-
-  setLoading('adminBtn', true);
+  const email=v('aId'),pass=v('aPass');
+  if(!email){setErr('aIdErr','Email is required');return;}
+  if(!pass){setErr('aPassErr','Password is required');return;}
+  const btn=document.getElementById('adminBtn');
+  btn.disabled=true; btn.textContent='⏳ Please wait...';
   try {
-    const cred = await auth.signInWithEmailAndPassword(email, pass);
-    const user = cred.user;
-
-    // Check admin role in Firestore
-    const adminDoc = await db.collection('admins').doc(user.uid).get();
-    if (!adminDoc.exists && !ADMIN_EMAILS.includes(user.email)) {
-      await auth.signOut();
-      setErr('aPassErr', 'Access denied. Not an admin account.');
-      return;
-    }
-
-    sessionStorage.setItem('eco_session', JSON.stringify({
-      role: 'admin', uid: user.uid, email: user.email, name: 'Admin'
-    }));
-
+    const cred=await auth.signInWithEmailAndPassword(email,pass);
+    if(!ADMIN_EMAILS.includes(cred.user.email)){await auth.signOut();setErr('aPassErr','You are not an admin.');return;}
+    sessionStorage.setItem('eco_session',JSON.stringify({role:'admin',uid:cred.user.uid,email:cred.user.email,name:'Admin'}));
     showToast('✅ Admin login successful!');
-    setTimeout(() => window.location.href = 'adminprofile.html', 1000);
-
-  } catch (err) {
-    const msg = err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
-      ? 'Invalid admin credentials'
-      : err.message;
-    setErr('aPassErr', msg);
-    showToast('❌ Admin login failed', true);
-  } finally {
-    document.getElementById('adminBtn').disabled = false;
-    document.getElementById('adminBtn').textContent = 'Access Admin Panel →';
-  }
+    setTimeout(()=>window.location.href='admin_pending.html',1000);
+  } catch(err){
+    setErr('aPassErr',(err.code==='auth/wrong-password'||err.code==='auth/user-not-found')?'Invalid admin credentials':err.message);
+    showToast('❌ Login failed',true);
+  } finally { resetBtn('adminBtn','Access Admin Panel →'); }
 }
-
-// ── Auto-redirect if already logged in ──
-auth.onAuthStateChanged(user => {
-  if (user) {
-    const session = JSON.parse(sessionStorage.getItem('eco_session') || '{}');
-    if (session.role === 'admin') {
-      window.location.href = 'adminprofile.html';
-    } else if (session.role === 'user') {
-      window.location.href = 'index.html';
-    }
-  }
-});
 </script>
 </body>
 </html>
