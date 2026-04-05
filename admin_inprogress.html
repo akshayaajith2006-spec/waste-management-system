@@ -9,6 +9,12 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap"
     rel="stylesheet" />
+  <link rel="stylesheet" href="desktop.css" />
+  <!-- ✅ FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="auth-guard.js"></script>
   <style>
     /* Admin-specific overrides */
     .admin-hero {
@@ -552,15 +558,18 @@
 
     <!-- KPI STRIP -->
     <div class="kpi-strip">
-      <div class="kpi" onclick="window.location.href='adminprofile.html'" style="cursor: pointer;" title="View All Requests">
+      <div class="kpi" onclick="window.location.href='adminprofile.html'" style="cursor: pointer;"
+        title="View All Requests">
         <div class="kpi-num" id="kpiTotal">–</div>
         <div class="kpi-label">Total</div>
       </div>
-      <div class="kpi" onclick="window.location.href='admin_pending.html'" style="cursor: pointer;" title="View Pending Requests">
+      <div class="kpi" onclick="window.location.href='admin_pending.html'" style="cursor: pointer;"
+        title="View Pending Requests">
         <div class="kpi-num" id="kpiPending">–</div>
         <div class="kpi-label">Pending</div>
       </div>
-      <div class="kpi" onclick="window.location.href='admin_done.html'" style="cursor: pointer;" title="View Done Requests">
+      <div class="kpi" onclick="window.location.href='admin_done.html'" style="cursor: pointer;"
+        title="View Done Requests">
         <div class="kpi-num" id="kpiDone">–</div>
         <div class="kpi-label">Done</div>
       </div>
@@ -647,203 +656,135 @@
   </div>
 
   <script>
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ✅ DECLARE global vars
+    let allRequests = [];
     let currentFilter = 'In Progress';
-    (function () {
-      const session = JSON.parse(localStorage.getItem('eco_session') || 'null');
-      if (!session || session.role !== 'admin') { window.location.href = 'login.html'; return; }
 
-      // Last login
+    async function checkAuth() {
+      const session = JSON.parse(sessionStorage.getItem('eco_session') || 'null');
+      if (!session || session.role !== 'admin') { 
+        auth.onAuthStateChanged(user => {
+          if(!user) window.location.href = 'login.html';
+        });
+      }
+      
       document.getElementById('lastLogin').textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-
-      loadData();
-    })();
-
-    function loadData() {
-      const pReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-      const reqs = Array.isArray(pReqs) ? pReqs : [];
-      const pUsers = JSON.parse(localStorage.getItem('eco_users') || '[]');
-      const users = Array.isArray(pUsers) ? pUsers : [];
-
-      // KPIs
-      document.getElementById('kpiTotal').textContent = reqs.length;
-      document.getElementById('kpiPending').textContent = reqs.filter(r => r.status === 'Pending').length;
-      document.getElementById('kpiDone').textContent = reqs.filter(r => r.status === 'Done' || r.status === 'In Progress').length;
-      document.getElementById('kpiUsers').textContent = users.length;
-
-      renderRequests(reqs);
-      renderUsers(users);
+      await loadData();
     }
 
-    function filterReqs(filter, el) {
-      currentFilter = filter;
-      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-      el.classList.add('active');
-      const pReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-      const reqs = Array.isArray(pReqs) ? pReqs : [];
-      renderRequests(reqs);
-    }
-
-    function renderRequests(reqs) {
+    async function loadData() {
       try {
-        const validReqs = reqs.filter(r => r && typeof r === 'object');
-        const filtered = currentFilter === 'all' ? validReqs : validReqs.filter(r => r.status === currentFilter);
-        const container = document.getElementById('requestsList');
-        if (!container) return;
-        if (!filtered.length) {
-          container.innerHTML = `<div class="empty-state">No ${currentFilter === 'all' ? '' : currentFilter.toLowerCase()} requests found.</div>`;
-          return;
-        }
-        container.innerHTML = filtered.slice().reverse().map(r => {
-          const isPending = r.status === 'Pending';
-          const isInProgress = r.status === 'In Progress';
-          const isDone = r.status === 'Done';
-          const statusBg = isPending ? 'linear-gradient(135deg,#fef3c7,#fde68a)'
-            : isInProgress ? 'linear-gradient(135deg,#dbeafe,#bfdbfe)'
-              : 'linear-gradient(135deg,#dcfce7,#a7f3d0)';
-          const statusColor = isPending ? '#78350f' : isInProgress ? '#1e40af' : '#14532d';
-          const cardClass = isPending ? 'pending' : isInProgress ? 'in-progress' : 'done';
-          return `
-      <div class="req-card ${cardClass}" id="card-${r.id}">
-        <div class="req-card-head">
-          <div>
-            <div class="req-id">${r.id}</div>
-            <div class="req-type">♻️ ${r.wasteType || 'General'} Waste</div>
-          </div>
-          <span style="font-size:12px;font-weight:800;padding:6px 14px;border-radius:20px;
-            background:${statusBg};color:${statusColor};white-space:nowrap; border: 1px solid ${statusColor};">
-            ${r.status || 'Pending'}
-          </span>
-        </div>
-        <div class="req-details">
-          <div class="req-detail">Name<span>${r.name || 'Unknown'}</span></div>
-          <div class="req-detail">Phone<span>${r.phone || 'Unknown'}</span></div>
-          <div class="req-detail">Date<span>${r.pickupDate || 'Any'}</span></div>
-          <div class="req-detail">Address<span>${String(r.address || '').substring(0, 20)}…</span></div>
-        </div>
-        ${isPending ? `
-        <div class="req-actions">
-          <button class="btn-approve" style="background:linear-gradient(135deg,#3b82f6,#2563eb); margin-right: 5px;" onclick="approveReq('${r.id}','In Progress')">🚛 Make In-Progress</button>
-          <button class="btn-approve" onclick="approveReq('${r.id}','Done')">✅ Mark as Done</button>
-        </div>` : isInProgress ? `
-        <div class="req-actions">
-          <button class="btn-approve" onclick="approveReq('${r.id}','Done')">✅ Mark as Done</button>
-          <button class="btn-view" onclick="viewReq('${r.id}')">👁️ View</button>
-        </div>` : `
-        <div class="req-actions">
-          <button class="btn-view" style="width:100%;" onclick="viewReq('${r.id}')">👁️ View Details</button>
-        </div>`}
-      </div>`;
-        }).join('');
-      } catch (e) {
-        console.error('renderRequests error', e);
-        document.getElementById('requestsList').innerHTML = `<div class="empty-state" style="color:red; text-align:left; white-space:pre-wrap;">Unable to load requests due to data format error.<br><br><b>Error Details:</b><br>${e.message}<br><br>${e.stack}</div>`;
+        const reqSnap = await db.collection('requests').orderBy('createdAt', 'desc').get();
+        allRequests = reqSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const userSnap = await db.collection('users').get();
+        const allUsers = userSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        document.getElementById('kpiTotal').textContent = allRequests.length;
+        document.getElementById('kpiPending').textContent = allRequests.filter(r => r.status === 'Pending').length;
+        document.getElementById('kpiDone').textContent = allRequests.filter(r => r.status === 'Done').length;
+        document.getElementById('kpiUsers').textContent = allUsers.length;
+
+        renderRequests();
+        renderUsers(allUsers);
+      } catch (err) {
+        console.error("LoadData Error:", err);
       }
     }
 
-    function renderUsers(users) {
-      try {
-        const validUsers = users.filter(u => u && typeof u === 'object');
-        const container = document.getElementById('usersList');
-        if (!container) return;
-        if (!validUsers.length) {
-          container.innerHTML = `<div class="empty-state">No registered users yet.</div>`;
-          return;
-        }
-        const reqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-        const validReqs = Array.isArray(reqs) ? reqs.filter(r => r && typeof r === 'object') : [];
-        container.innerHTML = validUsers.map(u => {
-          const userReqs = validReqs.filter(r => String(r.userId) === String(u.id)).length;
-          return `
-      <div class="user-card">
-        <div class="user-ava">${u.avatar || '🌿'}</div>
-        <div>
-          <div class="user-name">${u.name || 'Unknown User'}</div>
-          <div class="user-meta">${u.email || ''} ${u.phone ? '· ' + u.phone : ''}</div>
-        </div>
-        <div class="user-reqs">
-          <div class="user-reqs-num">${userReqs}</div>
-          <div class="user-reqs-label">Reqs</div>
-        </div>
-      </div>`;
-        }).join('');
-      } catch (e) {
-        console.error('renderUsers error', e);
-        document.getElementById('usersList').innerHTML = '<div class="empty-state">Error loading users.</div>';
-      }
-    }
+    function renderRequests() {
+      const container = document.getElementById('requestsList');
+      if (!container) return;
 
-    function approveReq(id, newStatus) {
-      console.log('approveReq called with', id, newStatus);
-      const pReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-      const reqs = Array.isArray(pReqs) ? pReqs : [];
-      const idx = reqs.findIndex(r => String(r.id) === String(id));
-      if (idx === -1) {
-        alert('Error: Request ' + id + ' not found in local storage.');
+      const filtered = allRequests.filter(r => r.status === currentFilter);
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="empty-state">No ${currentFilter.toLowerCase()} requests found.</div>`;
         return;
       }
-      reqs[idx].status = newStatus || 'Done';
-      if (newStatus === 'In Progress') reqs[idx].driverAssignedAt = new Date().toISOString();
-      if (newStatus === 'Done') reqs[idx].completedAt = new Date().toISOString();
-      localStorage.setItem('ecopickup_requests', JSON.stringify(reqs));
-      loadData();
-      
-      // Give feedback to the user
-      alert('Request ' + id + ' is now marked as ' + newStatus + '!');
+
+      container.innerHTML = filtered.map(r => {
+        const isPending = r.status === 'Pending';
+        const isInProgress = r.status === 'In Progress';
+        const statusBg = isPending ? 'linear-gradient(135deg,#fef3c7,#fde68a)'
+          : isInProgress ? 'linear-gradient(135deg,#dbeafe,#bfdbfe)'
+            : 'linear-gradient(135deg,#dcfce7,#a7f3d0)';
+        const statusColor = isPending ? '#78350f' : isInProgress ? '#1e40af' : '#14532d';
+        const cardClass = isPending ? 'pending' : isInProgress ? 'in-progress' : 'done';
+        
+        return `
+          <div class="req-card ${cardClass}" id="card-${r.id}">
+            <div class="req-card-head">
+              <div>
+                <div class="req-id">#${r.id.substring(0,6)}</div>
+                <div class="req-type">♻️ ${r.wasteType || 'General'} Waste</div>
+              </div>
+              <span style="font-size:11px;font-weight:800;padding:6px 14px;border-radius:20px;
+                background:${statusBg};color:${statusColor};white-space:nowrap; border: 1px solid ${statusColor};">
+                ${r.status || 'Pending'}
+              </span>
+            </div>
+            <div class="req-details">
+              <div class="req-detail">Name<span>${r.name || 'Unknown'}</span></div>
+              <div class="req-detail">Phone<span>${r.phone || '–'}</span></div>
+              <div class="req-detail">Date<span>${r.pickupDate || 'Any'}</span></div>
+              <div class="req-detail">Address<span title="${r.address}">${String(r.address || '').substring(0, 20)}…</span></div>
+            </div>
+            <div class="req-actions">
+              <button class="btn-approve" onclick="updateStatus('${r.id}','Done')">✅ Mark as Done</button>
+              <button class="btn-view" onclick="viewReq('${r.id}')">👁️ View</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function renderUsers(users) {
+      const container = document.getElementById('usersList');
+      if (!container) return;
+      container.innerHTML = users.slice(0,5).map(u => `
+        <div class="user-card">
+          <div class="user-ava">${u.avatar || '🌿'}</div>
+          <div>
+            <div class="user-name">${u.name || 'Anonymous'}</div>
+            <div class="user-meta">${u.email || ''}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function updateStatus(id, newStatus) {
+      if(!confirm(`Change status to ${newStatus}?`)) return;
+      try {
+        await db.collection('requests').doc(id).update({ 
+          status: newStatus,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('✅ Request updated!');
+        loadData();
+      } catch (err) {
+        alert('❌ Error: ' + err.message);
+      }
     }
 
     function viewReq(id) {
-      const pReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-      const reqs = Array.isArray(pReqs) ? pReqs : [];
-      const r = reqs.find(req => req.id === id);
+      const r = allRequests.find(req => req.id === id);
       if (!r) return;
-      alert(`📋 Request Details\n\nID: ${r.id}\nName: ${r.name}\nPhone: ${r.phone}\nAddress: ${r.address}\nWaste: ${r.wasteType}\nDate: ${r.pickupDate}\nStatus: ${r.status}`);
-    }
-
-    function exportData() {
-      const pReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-      const reqs = Array.isArray(pReqs) ? pReqs : [];
-      const csv = ['ID,Name,Phone,Address,Waste,Date,Status']
-        .concat(reqs.map(r => `${r.id},${r.name},${r.phone},"${r.address}",${r.wasteType},${r.pickupDate},${r.status}`))
-        .join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'ecopickup_requests.csv';
-      a.click();
-    }
-
-    function showStats() {
-      const pReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-      const reqs = Array.isArray(pReqs) ? pReqs : [];
-      const pending = reqs.filter(r => r.status === 'Pending').length;
-      const done = reqs.filter(r => r.status === 'Done').length;
-      const types = {};
-      reqs.forEach(r => { types[r.wasteType] = (types[r.wasteType] || 0) + 1; });
-      const typeStr = Object.entries(types).map(([k, v]) => `${k}: ${v}`).join(', ');
-      alert(`📊 Analytics\n\nTotal Requests: ${reqs.length}\nPending: ${pending}\nCompleted: ${done}\n\nWaste Types:\n${typeStr || 'No data'}`);
-    }
-
-    function showTab(tab) {
-      const map = {
-        'requests': 'requestsTitle',
-        'users': 'usersTitle'
-      };
-      const el = document.getElementById(map[tab]);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-        el.style.transition = 'background-color 0.5s';
-        el.style.backgroundColor = 'rgba(16, 185, 129, 0.3)';
-        el.style.borderRadius = '8px';
-        setTimeout(() => el.style.backgroundColor = 'transparent', 800);
-      }
+      alert(`📋 Request Details\n\nID: ${r.id}\nStatus: ${r.status}\nCustomer: ${r.name}\nPhone: ${r.phone}\nAddress: ${r.address}\nWaste Type: ${r.wasteType}\nPickup Date: ${r.pickupDate}`);
     }
 
     function logout() {
-      if (confirm('Logout from admin panel?')) {
-        localStorage.removeItem('eco_session');
-        window.location.href = 'login.html';
+      if (confirm('Logout?')) {
+        auth.signOut().then(() => {
+          sessionStorage.removeItem('eco_session');
+          window.location.href = 'login.html';
+        });
       }
     }
+
+    checkAuth();
   </script>
 </body>
 

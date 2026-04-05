@@ -1,0 +1,323 @@
+/* ============================================================
+   ECOPICKUP — DESKTOP RESPONSIVE OVERRIDE
+   Drop this <link> AFTER style.css in every HTML file:
+   <link rel="stylesheet" href="desktop.css" />
+   Mobile (≤768px): unchanged — your original style.css rules
+   Tablet (768–1024px): medium layout
+   Desktop (≥1024px): full website layout
+   ============================================================ */
+
+/* ─── TABLET (768px+) ─────────────────────────────────────── */
+@media (min-width: 768px) {
+
+    body {
+        background: linear-gradient(160deg, #e6f9ee 0%, #f0fdf4 100%);
+        justify-content: unset;
+        align-items: unset;
+    }
+
+    /* Kill the narrow card feel — app-shell becomes a real page */
+    .app-shell {
+        max-width: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        padding-bottom: 0 !important;
+        /* bottom-nav gone on tablet+ */
+    }
+
+    /* ── TOP NAV replaces mobile header ── */
+    .app-header {
+        padding: 0 40px;
+        height: 68px;
+        position: sticky;
+        top: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Desktop nav links injected via desktop-nav div */
+    .desktop-nav-links {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .desktop-nav-links a {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.25s;
+    }
+
+    .desktop-nav-links a:hover,
+    .desktop-nav-links a.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: #f0d060;
+    }
+
+    /* Hide mobile bottom nav on tablet+ */
+    .bottom-nav {
+        display: none !important;
+    }
+
+    /* ── Wide content wrapper ── */
+    .page-content {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+
+    /* ── Hero: split layout ── */
+    .hero-banner {
+        margin: 28px 40px;
+        border-radius: 28px;
+        padding: 52px 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 280px;
+    }
+
+    .hero-content {
+        flex: 1;
+        max-width: 520px;
+    }
+
+    .hero-content h1 {
+        font-size: 42px;
+        line-height: 1.2;
+    }
+
+    .hero-content p {
+        font-size: 15px;
+    }
+
+    .hero-icons {
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .icon-1 {
+        font-size: 90px;
+        opacity: 0.22;
+    }
+
+    .icon-2 {
+        font-size: 72px;
+        opacity: 0.18;
+    }
+
+    .icon-3 {
+        font-size: 58px;
+        opacity: 0.20;
+    }
+
+    /* ── Section titles ── */
+    .section-title {
+        padding: 28px 40px 12px;
+        font-size: 17px;
+    }
+
+    /* ── Impact: 3 cards in a row, nicer sizing ── */
+    .impact-section {
+        padding: 0 40px 12px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .impact-box {
+        padding: 22px 16px;
+    }
+
+    .impact-number {
+        font-size: 24px;
+    }
+
+    /* ── Stats row ── */
+    .stats-row {
+        padding: 0 40px;
+        gap: 16px;
+    }
+
+    .stat-card {
+        padding: 28px 16px;
+    }
+
+    .stat-num {
+        font-size: 36px;
+    }
+
+    /* ── Actions: 4 in a row ── */
+    .actions-grid {
+        padding: 0 40px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    /* ── Activity list ── */
+    .activity-list {
+        padding: 0 40px 40px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    /* ── Page topbar (request/status/profile pages) ── */
+    .page-topbar {
+        padding: 20px 40px;
+        position: sticky;
+        top: 0;
+    }
+
+    /* ── Form pages: centered card, wider ── */
+    .progress-steps {
+        padding: 24px 40px 24px;
+    }
+
+    .form-step {
+        padding: 0 40px 24px;
+    }
+
+    .step-card {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .status-search-section {
+        padding: 40px 40px 24px;
+    }
+
+    #resultContainer {
+        padding: 0 40px 40px;
+    }
+
+    .status-result-card {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* Login page */
+    .login-shell .login-header {
+        padding: 48px 60px 36px;
+    }
+
+    .login-shell .login-body {
+        padding: 32px 60px 48px;
+    }
+}
+
+
+/* ─── DESKTOP (1024px+) ────────────────────────────────────── */
+@media (min-width: 1024px) {
+
+    .app-header {
+        padding: 0 60px;
+        height: 72px;
+    }
+
+    .hero-banner {
+        margin: 36px 60px;
+        padding: 64px 72px;
+        min-height: 320px;
+    }
+
+    .hero-content h1 {
+        font-size: 52px;
+    }
+
+    .icon-1 {
+        font-size: 110px;
+    }
+
+    .icon-2 {
+        font-size: 88px;
+    }
+
+    .icon-3 {
+        font-size: 70px;
+    }
+
+    .section-title {
+        padding: 32px 60px 14px;
+        font-size: 18px;
+    }
+
+    .impact-section {
+        padding: 0 60px 16px;
+        gap: 20px;
+    }
+
+    .stats-row {
+        padding: 0 60px;
+        gap: 20px;
+    }
+
+    .actions-grid {
+        padding: 0 60px;
+        gap: 18px;
+    }
+
+    .activity-list {
+        padding: 0 60px 48px;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .form-step {
+        padding: 0 60px 32px;
+    }
+
+    .status-search-section {
+        padding: 48px 60px 28px;
+    }
+
+    #resultContainer {
+        padding: 0 60px 48px;
+    }
+
+    /* Two-column layout for request/status pages */
+    .two-col-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        padding: 0 60px 48px;
+        align-items: start;
+    }
+
+    /* Wider form card on big screens */
+    .step-card {
+        max-width: 100%;
+    }
+
+    /* Larger stat numbers */
+    .stat-num {
+        font-size: 42px;
+    }
+
+    .impact-number {
+        font-size: 28px;
+    }
+}
+
+
+/* ─── UTILITY: desktop-nav-links hidden on mobile ─────────── */
+.desktop-nav-links {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .desktop-nav-links {
+        display: flex;
+    }
+}
