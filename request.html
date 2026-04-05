@@ -1,42 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EcoPickup – Request</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EcoPickup – Request</title>
+<link rel="stylesheet" href="style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="app-shell">
 
-  <!-- ===== TOP BAR ===== -->
   <div class="page-topbar eco-topbar">
     <a href="index.html" class="back-arrow">←</a>
     <h2>Schedule Pickup</h2>
     <span></span>
   </div>
 
-  <!-- ===== PROGRESS STEPS ===== -->
   <div class="progress-steps">
-    <div class="step active" id="step1-dot">
-      <div class="step-circle">1</div>
-      <span>Info</span>
-    </div>
+    <div class="step active" id="step1-dot"><div class="step-circle">1</div><span>Info</span></div>
     <div class="step-line" id="line1"></div>
-    <div class="step" id="step2-dot">
-      <div class="step-circle">2</div>
-      <span>Waste</span>
-    </div>
+    <div class="step" id="step2-dot"><div class="step-circle">2</div><span>Waste</span></div>
     <div class="step-line" id="line2"></div>
-    <div class="step" id="step3-dot">
-      <div class="step-circle">3</div>
-      <span>Date</span>
-    </div>
+    <div class="step" id="step3-dot"><div class="step-circle">3</div><span>Date</span></div>
   </div>
 
-  <!-- ===== FORM ===== -->
-  <form id="requestForm" onsubmit="return validateForm()">
+  <form id="requestForm" onsubmit="return false">
 
     <!-- STEP 1 -->
     <div class="form-step active" id="formStep1">
@@ -44,26 +35,17 @@
         <h3 class="step-heading">👤 Your Information</h3>
         <div class="input-group">
           <label>Full Name</label>
-          <div class="input-wrap">
-            <span class="input-icon">👤</span>
-            <input type="text" id="name" name="name" placeholder="Your full name"/>
-          </div>
+          <div class="input-wrap"><span class="input-icon">👤</span><input type="text" id="name" placeholder="Your full name"/></div>
           <span class="error" id="nameError"></span>
         </div>
         <div class="input-group">
           <label>Phone Number</label>
-          <div class="input-wrap">
-            <span class="input-icon">📞</span>
-            <input type="text" id="phone" name="phone" placeholder="10-digit number"/>
-          </div>
+          <div class="input-wrap"><span class="input-icon">📞</span><input type="text" id="phone" placeholder="10-digit number"/></div>
           <span class="error" id="phoneError"></span>
         </div>
         <div class="input-group">
           <label>Address</label>
-          <div class="input-wrap">
-            <span class="input-icon">🏠</span>
-            <input type="text" id="address" name="address" placeholder="Your address"/>
-          </div>
+          <div class="input-wrap"><span class="input-icon">🏠</span><input type="text" id="address" placeholder="Your address"/></div>
           <span class="error" id="addressError"></span>
         </div>
         <button type="button" class="btn-next" onclick="goStep(2)">Next →</button>
@@ -73,28 +55,18 @@
     <!-- STEP 2 -->
     <div class="form-step" id="formStep2">
       <div class="step-card">
-        <h3 class="step-heading">♻️ Waste Type</h3>
-        <input type="hidden" id="wasteType" name="wasteType"/>
+        <h3 class="step-heading">♻️ Select Waste Type</h3>
+        <input type="hidden" id="wasteType"/>
         <span class="error" id="wasteError"></span>
         <div class="waste-selector">
-          <div class="waste-option" onclick="selectWaste(this,'Plastic')">
-            <span class="waste-emoji">🧴</span><span>Plastic</span>
-          </div>
-          <div class="waste-option" onclick="selectWaste(this,'Food')">
-            <span class="waste-emoji">🍃</span><span>Food</span>
-          </div>
-          <div class="waste-option" onclick="selectWaste(this,'Paper')">
-            <span class="waste-emoji">📄</span><span>Paper</span>
-          </div>
-          <div class="waste-option" onclick="selectWaste(this,'Metal')">
-            <span class="waste-emoji">🔩</span><span>Metal</span>
-          </div>
-          <div class="waste-option" onclick="selectWaste(this,'Glass')">
-            <span class="waste-emoji">🪟</span><span>Glass</span>
-          </div>
-          <div class="waste-option" onclick="selectWaste(this,'Other')">
-            <span class="waste-emoji">🗑️</span><span>Other</span>
-          </div>
+          <div class="waste-option" onclick="selectWaste(this,'Plastic')"><span class="waste-emoji">🧴</span><span>Plastic</span></div>
+          <div class="waste-option" onclick="selectWaste(this,'Food')"><span class="waste-emoji">🍃</span><span>Food</span></div>
+          <div class="waste-option" onclick="selectWaste(this,'Paper')"><span class="waste-emoji">📄</span><span>Paper</span></div>
+          <div class="waste-option" onclick="selectWaste(this,'Metal')"><span class="waste-emoji">🔩</span><span>Metal</span></div>
+          <div class="waste-option" onclick="selectWaste(this,'Glass')"><span class="waste-emoji">🪟</span><span>Glass</span></div>
+          <div class="waste-option" onclick="selectWaste(this,'E-Waste')"><span class="waste-emoji">💻</span><span>E-Waste</span></div>
+          <div class="waste-option" onclick="selectWaste(this,'Organic')"><span class="waste-emoji">🌿</span><span>Organic</span></div>
+          <div class="waste-option" onclick="selectWaste(this,'Other')"><span class="waste-emoji">🗑️</span><span>Other</span></div>
         </div>
         <div class="btn-row">
           <button type="button" class="btn-back-step" onclick="goStep(1)">← Back</button>
@@ -109,69 +81,135 @@
         <h3 class="step-heading">📅 Schedule Date</h3>
         <div class="input-group">
           <label>Preferred Pickup Date</label>
-          <div class="input-wrap">
-            <span class="input-icon">📅</span>
-            <input type="date" id="pickupDate" name="pickupDate"/>
-          </div>
+          <div class="input-wrap"><span class="input-icon">📅</span><input type="date" id="pickupDate"/></div>
           <span class="error" id="dateError"></span>
         </div>
         <div class="summary-box">
           <h4>📋 Request Summary</h4>
-          <div class="summary-item">
-            <span class="summary-label">Name</span>
-            <span class="summary-value" id="sumName">–</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Phone</span>
-            <span class="summary-value" id="sumPhone">–</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Waste Type</span>
-            <span class="summary-value" id="sumWaste">–</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Date</span>
-            <span class="summary-value" id="sumDate">–</span>
-          </div>
+          <div class="summary-item"><span class="summary-label">Name</span><span class="summary-value" id="sumName">–</span></div>
+          <div class="summary-item"><span class="summary-label">Phone</span><span class="summary-value" id="sumPhone">–</span></div>
+          <div class="summary-item"><span class="summary-label">Waste Type</span><span class="summary-value" id="sumWaste">–</span></div>
+          <div class="summary-item"><span class="summary-label">Date</span><span class="summary-value" id="sumDate">–</span></div>
         </div>
         <div class="btn-row">
           <button type="button" class="btn-back-step" onclick="goStep(2)">← Back</button>
-          <button type="submit" class="btn-submit">🚀 Submit</button>
+          <button type="button" class="btn-submit" id="submitBtn" onclick="submitRequest()">🚀 Submit</button>
         </div>
       </div>
     </div>
 
   </form>
 
-  <!-- ===== SUCCESS SCREEN ===== -->
-  <div class="success-screen" id="successScreen">
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen" style="display:none;">
     <div class="success-animation">🎉</div>
     <h2><span>Request Submitted!</span></h2>
     <p>Your pickup has been scheduled successfully</p>
-    <div class="req-id-box">
-      Your Request ID<strong id="generatedId">REQ1002</strong>
-    </div>
+    <div class="req-id-box">Your Request ID<strong id="generatedId"></strong></div>
     <a href="status.html" class="btn-next" style="text-decoration:none;display:block;margin-top:20px;">Track My Request →</a>
     <a href="index.html" class="btn-back-link">← Back to Home</a>
   </div>
 
-  <!-- ===== BOTTOM NAV ===== -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">
-      <span class="nav-icon">🏠</span><span>Home</span>
-    </a>
-    <a href="request.html" class="nav-item active">
-      <span class="nav-icon">📝</span><span>Request</span>
-    </a>
-    <a href="status.html" class="nav-item">
-      <span class="nav-icon">🔍</span><span>Track</span>
-    </a>
-    <a href="#" class="nav-item">
-      <span class="nav-icon">👤</span><span>Profile</span>
-    </a>
+    <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="request.html" class="nav-item active"><span class="nav-icon">📝</span><span>Request</span></a>
+    <a href="status.html" class="nav-item"><span class="nav-icon">🔍</span><span>Track</span></a>
+    <a href="userprofie.html" class="nav-item"><span class="nav-icon">👤</span><span>Profile</span></a>
   </nav>
 
 </div>
 <script src="app.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAQTRW_YFVBCuuNlOe4wZ0rvEQnKDHrT-c",
+  authDomain: "waste-management-system-7b2d4.firebaseapp.com",
+  projectId: "waste-management-system-7b2d4",
+  storageBucket: "waste-management-system-7b2d4.firebasestorage.app",
+  messagingSenderId: "791452329907",
+  appId: "1:791452329907:web:9f1909e3d2bff35f354dc6",
+  measurementId: "G-EYLQ1WT1SJ"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let currentUser = null;
+
+auth.onAuthStateChanged(async user => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  currentUser = user;
+  document.getElementById('pickupDate').min = new Date().toISOString().split('T')[0];
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  if (userDoc.exists) {
+    const d = userDoc.data();
+    if (d.name) document.getElementById('name').value = d.name;
+    if (d.phone) document.getElementById('phone').value = d.phone;
+    if (d.address) document.getElementById('address').value = d.address;
+  }
+});
+
+function goStep(step) {
+  if (step === 2) {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    let ok = true;
+    ['nameError','phoneError','addressError'].forEach(id => document.getElementById(id).textContent = '');
+    if (!name) { document.getElementById('nameError').textContent = 'Name is required'; ok = false; }
+    if (!/^\d{10}$/.test(phone)) { document.getElementById('phoneError').textContent = 'Enter valid 10-digit phone'; ok = false; }
+    if (!address) { document.getElementById('addressError').textContent = 'Address is required'; ok = false; }
+    if (!ok) return;
+  }
+  if (step === 3) {
+    if (!document.getElementById('wasteType').value) {
+      document.getElementById('wasteError').textContent = 'Please select a waste type'; return;
+    }
+    document.getElementById('wasteError').textContent = '';
+    document.getElementById('sumName').textContent = document.getElementById('name').value;
+    document.getElementById('sumPhone').textContent = document.getElementById('phone').value;
+    document.getElementById('sumWaste').textContent = document.getElementById('wasteType').value;
+    document.getElementById('pickupDate').onchange = function() {
+      document.getElementById('sumDate').textContent = this.value;
+    };
+  }
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('formStep' + step).classList.add('active');
+  for (let i = 1; i <= 3; i++) document.getElementById('step'+i+'-dot').classList.toggle('active', i <= step);
+  for (let i = 1; i <= 2; i++) { const l = document.getElementById('line'+i); if(l) l.classList.toggle('active', i < step); }
+}
+
+function selectWaste(el, type) {
+  document.querySelectorAll('.waste-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('wasteType').value = type;
+  document.getElementById('wasteError').textContent = '';
+}
+
+async function submitRequest() {
+  const pickupDate = document.getElementById('pickupDate').value;
+  if (!pickupDate) { document.getElementById('dateError').textContent = 'Please select a pickup date'; return; }
+  document.getElementById('dateError').textContent = '';
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '⏳ Submitting...';
+  try {
+    const docRef = await db.collection('requests').add({
+      userId: currentUser.uid,
+      userEmail: currentUser.email,
+      userName: document.getElementById('name').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      pickupAddress: document.getElementById('address').value.trim(),
+      wasteType: document.getElementById('wasteType').value,
+      pickupDate,
+      status: 'Pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('requestForm').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+    document.getElementById('generatedId').textContent = ' REQ-' + docRef.id.slice(0,6).toUpperCase();
+  } catch (err) {
+    alert('❌ Failed: ' + err.message);
+    btn.disabled = false; btn.textContent = '🚀 Submit';
+  }
+}
+</script>
 </body>
 </html>

@@ -1,174 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EcoPickup – Home</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EcoPickup – Home</title>
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@400;600;700;800;900&display=swap"
-    rel="stylesheet" />
+<!-- ✅ FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
-  <div class="app-shell">
+<div class="app-shell">
 
-    <!-- ===== HEADER ===== -->
-    <div class="app-header eco-header">
-      <div class="header-left">
-        <span class="app-logo">🌍</span>
-        <div>
-          <p class="greet">Welcome Back 👋</p>
-          <h2 class="app-title">EcoPickup</h2>
-        </div>
-      </div>
-      <div class="notif-btn">🔔</div>
-    </div>
-
-    <!-- ===== HERO BANNER ===== -->
-    <div class="hero-banner eco-hero">
-      <div class="hero-shine"></div>
-      <div class="hero-content">
-        <span class="eco-badge">🌱 Go Green</span>
-        <h1>Recycle Today,<br /><em>Thrive Tomorrow</em></h1>
-        <p>Join thousands making the planet cleaner</p>
-        <a href="request.html" class="hero-btn">✦ Schedule Now</a>
-      </div>
-      <div class="hero-icons">
-        <span class="icon-1">🗑️</span>
-        <span class="icon-2">♻️</span>
-        <span class="icon-3">🌿</span>
+  <!-- ===== HEADER ===== -->
+  <div class="app-header eco-header">
+    <div class="header-left">
+      <span class="app-logo">🌍</span>
+      <div>
+        <p class="greet" id="greetMsg">Welcome Back 👋</p>
+        <h2 class="app-title">EcoPickup</h2>
       </div>
     </div>
-
-    <!-- ===== GREEN IMPACT ===== -->
-    <div class="section-title">🌱 Your Green Impact</div>
-    <div class="impact-section">
-      <div class="impact-box impact-green">
-        <div class="impact-number">24 kg</div>
-        <div class="impact-label">Waste Diverted</div>
-        <div class="progress-eco">
-          <div class="progress-fill" style="width:70%"></div>
-        </div>
-      </div>
-      <div class="impact-box impact-teal">
-        <div class="impact-number">12</div>
-        <div class="impact-label">Trees Saved</div>
-        <div class="progress-eco">
-          <div class="progress-fill" style="width:50%"></div>
-        </div>
-      </div>
-      <div class="impact-box impact-cyan">
-        <div class="impact-number">450L</div>
-        <div class="impact-label">Water Saved</div>
-        <div class="progress-eco">
-          <div class="progress-fill" style="width:75%"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== STATS ===== -->
-    <div class="section-title">📊 Your Activity</div>
-    <div class="stats-row">
-      <div class="stat-card stat-green">
-        <span class="stat-icon">📋</span>
-        <span class="stat-num" id="homeTotalReqs">0</span>
-        <span class="stat-label">Requests</span>
-      </div>
-      <div class="stat-card stat-teal">
-        <span class="stat-icon">⏳</span>
-        <span class="stat-num" id="homePendingReqs">0</span>
-        <span class="stat-label">Pending</span>
-      </div>
-      <div class="stat-card stat-cyan">
-        <span class="stat-icon">✅</span>
-        <span class="stat-num" id="homeDoneReqs">0</span>
-        <span class="stat-label">Done</span>
-      </div>
-    </div>
-
-    <!-- ===== QUICK ACTIONS ===== -->
-    <div class="section-title">⚡ Quick Actions</div>
-    <div class="actions-grid">
-      <a href="request.html" class="action-card action-green">
-        <span class="action-icon">📝</span>
-        <span>New Request</span>
-      </a>
-      <a href="status.html" class="action-card action-teal">
-        <span class="action-icon">🔍</span>
-        <span>Track Status</span>
-      </a>
-      <a href="#" class="action-card action-cyan">
-        <span class="action-icon">🏆</span>
-        <span>Achievements</span>
-      </a>
-      <a href="#" class="action-card action-lime">
-        <span class="action-icon">⭐</span>
-        <span>Rewards</span>
-      </a>
-    </div>
-
-    <!-- ===== RECENT ACTIVITY ===== -->
-    <div class="section-title">📌 Recent Activity</div>
-    <div class="activity-list" id="homeActivityList">
-    </div>
-
-    <!-- ===== BOTTOM NAV ===== -->
-    <nav class="bottom-nav">
-      <a href="index.html" class="nav-item active">
-        <span class="nav-icon">🏠</span><span>Home</span>
-      </a>
-      <a href="request.html" class="nav-item">
-        <span class="nav-icon">📝</span><span>Request</span>
-      </a>
-      <a href="status.html" class="nav-item">
-        <span class="nav-icon">🔍</span><span>Track</span>
-      </a>
-      <a href="user-profile.html" class="nav-item">
-        <span class="nav-icon">👤</span><span>Profile</span>
-      </a>
-    </nav>
-
+    <div class="notif-btn">🔔</div>
   </div>
-  <script src="app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      let session = JSON.parse(localStorage.getItem('eco_session') || 'null');
 
-      // Redirect to login if not logged in
-      if (!session) {
-        window.location.href = 'login.html';
-        return;
-      }
+  <!-- ===== HERO BANNER ===== -->
+  <div class="hero-banner eco-hero">
+    <div class="hero-shine"></div>
+    <div class="hero-content">
+      <span class="eco-badge">🌱 Go Green</span>
+      <h1>Recycle Today,<br /><em>Thrive Tomorrow</em></h1>
+      <p>Join thousands making the planet cleaner</p>
+      <a href="request.html" class="hero-btn">✦ Schedule Now</a>
+    </div>
+    <div class="hero-icons">
+      <span class="icon-1">🗑️</span>
+      <span class="icon-2">♻️</span>
+      <span class="icon-3">🌿</span>
+    </div>
+  </div>
 
-      const allReqs = JSON.parse(localStorage.getItem('ecopickup_requests') || '[]');
-      const myReqs = session ? allReqs.filter(r => r.userId === session.id) : [];
+  <!-- ===== GREEN IMPACT ===== -->
+  <div class="section-title">🌱 Your Green Impact</div>
+  <div class="impact-section">
+    <div class="impact-box impact-green">
+      <div class="impact-number">24 kg</div>
+      <div class="impact-label">Waste Diverted</div>
+      <div class="progress-eco"><div class="progress-fill" style="width:70%"></div></div>
+    </div>
+    <div class="impact-box impact-teal">
+      <div class="impact-number">12</div>
+      <div class="impact-label">Trees Saved</div>
+      <div class="progress-eco"><div class="progress-fill" style="width:50%"></div></div>
+    </div>
+    <div class="impact-box impact-cyan">
+      <div class="impact-number">450L</div>
+      <div class="impact-label">Water Saved</div>
+      <div class="progress-eco"><div class="progress-fill" style="width:75%"></div></div>
+    </div>
+  </div>
 
-      document.getElementById('homeTotalReqs').textContent = myReqs.length;
-      document.getElementById('homePendingReqs').textContent = myReqs.filter(r => r.status === 'Pending').length;
-      document.getElementById('homeDoneReqs').textContent = myReqs.filter(r => r.status === 'Done').length;
+  <!-- ===== STATS ===== -->
+  <div class="section-title">📊 Your Activity</div>
+  <div class="stats-row">
+    <div class="stat-card stat-green">
+      <span class="stat-icon">📋</span>
+      <span class="stat-num" id="homeTotalReqs">0</span>
+      <span class="stat-label">Requests</span>
+    </div>
+    <div class="stat-card stat-teal">
+      <span class="stat-icon">⏳</span>
+      <span class="stat-num" id="homePendingReqs">0</span>
+      <span class="stat-label">Pending</span>
+    </div>
+    <div class="stat-card stat-cyan">
+      <span class="stat-icon">✅</span>
+      <span class="stat-num" id="homeDoneReqs">0</span>
+      <span class="stat-label">Done</span>
+    </div>
+  </div>
 
-      const container = document.getElementById('homeActivityList');
-      if (myReqs.length === 0) {
-        container.innerHTML = '<div style="padding:16px;text-align:center;color:#5a7a65;font-weight:600;font-size:14px;">No requests yet</div>';
-      } else {
-        container.innerHTML = myReqs.slice(-2).reverse().map(r => {
-          const isPending = r.status === 'Pending';
-          return `
-      <div class="activity-item ${isPending ? 'activity-pending' : 'activity-done'}">
-        <span class="activity-icon">${isPending ? '⏳' : '✅'}</span>
-        <div class="activity-info">
-          <p class="activity-title">${r.wasteType || 'Waste'} Pickup</p>
-          <p class="activity-meta">${r.pickupDate || ''} · ${r.id}</p>
-        </div>
-        <span class="${isPending ? 'badge-pending' : 'badge-done'}">${r.status}</span>
-      </div>`;
-        }).join('');
-      }
-    });
-  </script>
+  <!-- ===== QUICK ACTIONS ===== -->
+  <div class="section-title">⚡ Quick Actions</div>
+  <div class="actions-grid">
+    <a href="request.html" class="action-card action-green"><span class="action-icon">📝</span><span>New Request</span></a>
+    <a href="status.html" class="action-card action-teal"><span class="action-icon">🔍</span><span>Track Status</span></a>
+    <a href="#" class="action-card action-cyan"><span class="action-icon">🏆</span><span>Achievements</span></a>
+    <a href="#" class="action-card action-lime"><span class="action-icon">⭐</span><span>Rewards</span></a>
+  </div>
+
+  <!-- ===== RECENT ACTIVITY ===== -->
+  <div class="section-title">📌 Recent Activity</div>
+  <div class="activity-list" id="homeActivityList">
+    <div style="padding:16px;text-align:center;color:#5a7a65;font-weight:600;font-size:14px;">Loading...</div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item active"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="request.html" class="nav-item"><span class="nav-icon">📝</span><span>Request</span></a>
+    <a href="status.html" class="nav-item"><span class="nav-icon">🔍</span><span>Track</span></a>
+    <a href="userprofie.html" class="nav-item"><span class="nav-icon">👤</span><span>Profile</span></a>
+  </nav>
+
+</div>
+
+<script src="app.js"></script>
+<script>
+// ✅ FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyAQTRW_YFVBCuuNlOe4wZ0rvEQnKDHrT-c",
+  authDomain: "waste-management-system-7b2d4.firebaseapp.com",
+  projectId: "waste-management-system-7b2d4",
+  storageBucket: "waste-management-system-7b2d4.firebasestorage.app",
+  messagingSenderId: "791452329907",
+  appId: "1:791452329907:web:9f1909e3d2bff35f354dc6",
+  measurementId: "G-EYLQ1WT1SJ"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ✅ Check login
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Show user name in greeting
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  const name = userDoc.exists ? userDoc.data().name : user.displayName || 'User';
+  document.getElementById('greetMsg').textContent = `Welcome Back, ${name} 👋`;
+
+  // ✅ Load requests from Firestore
+  const snapshot = await db.collection('requests')
+    .where('userId', '==', user.uid)
+    .orderBy('createdAt', 'desc')
+    .get();
+
+  const reqs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  document.getElementById('homeTotalReqs').textContent = reqs.length;
+  document.getElementById('homePendingReqs').textContent = reqs.filter(r => r.status === 'Pending').length;
+  document.getElementById('homeDoneReqs').textContent = reqs.filter(r => r.status === 'Done').length;
+
+  const container = document.getElementById('homeActivityList');
+  if (reqs.length === 0) {
+    container.innerHTML = '<div style="padding:16px;text-align:center;color:#5a7a65;font-weight:600;font-size:14px;">No requests yet</div>';
+  } else {
+    container.innerHTML = reqs.slice(0, 3).map(r => {
+      const isPending = r.status === 'Pending';
+      return `
+        <div class="activity-item ${isPending ? 'activity-pending' : 'activity-done'}">
+          <span class="activity-icon">${isPending ? '⏳' : '✅'}</span>
+          <div class="activity-info">
+            <p class="activity-title">${r.wasteType || 'Waste'} Pickup</p>
+            <p class="activity-meta">${r.pickupDate || ''} · ${r.id}</p>
+          </div>
+          <span class="${isPending ? 'badge-pending' : 'badge-done'}">${r.status}</span>
+        </div>`;
+    }).join('');
+  }
+});
+</script>
 </body>
-
 </html>
